@@ -1,19 +1,28 @@
-import {IncomingMessage, Transport, LinkEvents, RequestMessage, ResponseMessage} from "./Transport";
+import {IncomingMessage, LinkEvents, RequestMessage, ResponseMessage, Transport} from "./Transport";
 import {PeerRegistry} from "./Peer";
 import {getRandomInt} from "./DummyUtils";
+import {EventEmitter} from "events";
 
 interface ComManagerConfig {
     appName: string
     link: Transport
 }
 
-export class ComManager {
+export enum ComEvents {
+    NOTIFY_MANAGER = "NOTIFY_MANAGER",
+    MESSAGE_FROM_SERVER = "MESSAGE_FROM_SERVER",
+    NEW_PEER = 'NEW_PEER',
+    STATE_REHYDRATE = "STATE_REHYDRATE"
+}
+
+export class ComManager extends EventEmitter {
 
     private readonly appName: string
     private readonly link: Transport
     private readonly peers
 
     constructor(config: ComManagerConfig) {
+        super()
         this.appName = config.appName
         this.peers = new PeerRegistry(config.appName)
         this.link = config.link
@@ -30,8 +39,6 @@ export class ComManager {
             }))
 
         })
-
-        console.log('UP', this)
 
         this.link.on(LinkEvents.POOP, (incomingMessage: IncomingMessage) => {
 
@@ -60,20 +67,25 @@ export class ComManager {
             if (!msg.isTyped()) {
                 // Untyped only on message from server!
                 // Multiple peers such as initial connect
-                if (Array.isArray(msg.payload)) this.peers.pushMultiplePeers(msg.payload)
+                if (Array.isArray(msg.payload)) {
+                    this.emit(ComEvents.STATE_REHYDRATE, msg.payload)
+                    this.peers.pushMultiplePeers(msg.payload)
+                }
                 // Single peer, on continues connection
-                else this.peers.pushOnNewPeer(msg.payload)
+                else {
+                    this.emit(ComEvents.NEW_PEER, msg.payload)
+                    this.peers.pushOnNewPeer(msg.payload)
+                }
             }
         })
+    }
 
-        // Initial notification
+    connectWithPayload(payload: any) {
         this.link.sendToServer(JSON.stringify({
             peer: {
                 name: this.appName
             },
-            payload: {
-                greeting: 'Yo'
-            }
+            payload: payload
         }))
     }
 

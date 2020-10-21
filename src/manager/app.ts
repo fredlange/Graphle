@@ -74,10 +74,13 @@ export class UDPClusterManager {
                         break
                     }
                     default: {
-                        const {peer} = _msg
+                        const {peer, payload} = _msg
                         let peersOfPeer = this.registry.getPeersOfPeer(peer);
                         for (const p of peersOfPeer) {
-                            this.sendMessage(peer, p)
+                            this.sendMessage({
+                                ...peer,
+                                ...payload
+                            }, p)
                         }
                         this.sendMessage(peersOfPeer, peer)
                         this.registry.pushOnNewPeer(peer)
