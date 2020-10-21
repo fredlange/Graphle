@@ -116,7 +116,7 @@ export class UDPLink extends EventEmitter implements Transport {
             .on('connect', () => console.log('Connected'))
             .on('listening', () => {
                 const address = this.socket.address();
-                console.log(`Server listening ${address.address}:${address.port}`);
+                console.log(`Peer listening ${address.address}:${address.port}`);
             })
             .bind()
 
@@ -158,6 +158,7 @@ export class UDPLink extends EventEmitter implements Transport {
     }
 
     sendToServer(msg: string): void {
+        console.log('Send to server', msg)
         this.socket.send(msg, this.serverPort)
     }
 

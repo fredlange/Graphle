@@ -2,14 +2,26 @@ import {ComManager} from "./transport/ComManager";
 import {UDPLink} from "./transport/Transport";
 
 const app = new ComManager({
-    appName: name,
+    appName: 'TheFirstApp',
     link: new UDPLink(41236)
 });
 
-app._exchange('Poop', {
-    hello: 'dude'
-}).then(
-    res => console.log('Respojse', res)
-).catch(
-    e => console.error('Error', e)
-)
+const app2 = new ComManager({
+    appName: 'TheSecondApp',
+    link: new UDPLink(41236)
+});
+
+
+setTimeout(() => {
+
+    app._exchange('TheSecondApp', {greeting: 'dude'})
+        .then(res => console.log('Respojse', res))
+        .catch(e => console.error('Error', e))
+
+
+}, 10)
+
+
+
+
+

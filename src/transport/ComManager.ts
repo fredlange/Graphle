@@ -31,6 +31,8 @@ export class ComManager {
 
         })
 
+        console.log('UP', this)
+
         this.link.on(LinkEvents.POOP, (incomingMessage: IncomingMessage) => {
 
             const seriousResponse = () => {
