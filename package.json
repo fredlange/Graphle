@@ -5,12 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start:manager": "ts-node ./src/manager.ts",
+    "start:spectator:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/spectator.ts",
     "start:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.11.0",
+    "graphql": "^15.3.0",
+    "graphql-tools": "^6.2.4",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
