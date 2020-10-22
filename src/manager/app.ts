@@ -4,6 +4,7 @@ import {IncomingMessage} from "./IncomingMessage";
 import {PeerRegistry} from "./Peer";
 import {RequestRegistry} from "./RequestRegistry";
 import {IOutboundMessage, Peer} from "./types";
+import {LinkEvents} from "../transport/Transport";
 
 /**
  * APP ONE
@@ -52,7 +53,7 @@ export class UDPClusterManager {
             // console.log('Ping all peers')
             for (const p of this.registry.getAllPeers()) {
                 try {
-                    await this.exchange({}, p, 'PING')
+                    await this.exchange({}, p, LinkEvents.PING)
                 } catch (e) {
                     this.registry.removePeer((e as IOutboundMessage).peer)
                 }
