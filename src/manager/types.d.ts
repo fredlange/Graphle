@@ -3,6 +3,11 @@ interface Component extends IConsumer {
 }
 
 export interface Peer extends Component, IProducer {
+    state: PeerState
+}
+
+export interface PeerState {
+    schemaSource: string
 }
 
 export interface IProducer {

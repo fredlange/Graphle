@@ -12,7 +12,10 @@ export class IncomingMessage implements IMessageInbound {
         this.peer = {
             name: peer.name,
             port: rInfo.port,
-            address: rInfo.address
+            address: rInfo.address,
+            state: {
+                schemaSource: payload.schemaSource
+            }
         }
         this.payload = payload
         this.id = id
