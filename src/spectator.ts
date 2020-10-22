@@ -44,12 +44,8 @@ function graphQLDynamicSchema(initalSchema: GraphQLSchema): (req, res, next) => 
     grapp.on(ComEvents.NEW_PEER, (event) => {
         console.log('SPECTATOR NOTICED A NEW COMPONENT');
         console.log('EVENT', event)
-        // let parse = JSON.parse(event);
 
         const newSchema = buildSchema(event.schemaSource);
-        const kek = () => {
-
-        }
         const newSchema2 = {
             schema: newSchema,
             executor: async ({document, variables}) => {
@@ -59,19 +55,14 @@ function graphQLDynamicSchema(initalSchema: GraphQLSchema): (req, res, next) => 
                 });
 
                 console.log('Executor result', newVar)
-                return {data: newVar}
+                return newVar
             }
-            // TODO: Need to write some kind of executor for the new schema
-            // executor: () ...
+
         } as SubschemaConfig
 
         let stitchedSchemas = stitchSchemas(
             {subschemas: [_schema, newSchema2]}
         )
-
-        // stitchedSchemas = addMocksToSchema({
-        //     schema: stitchedSchemas
-        // })
 
         _schema = stitchedSchemas;
         console.log('NEW SCHEMA SET');
@@ -79,18 +70,5 @@ function graphQLDynamicSchema(initalSchema: GraphQLSchema): (req, res, next) => 
 
     return (req, res, _) => graphqlHTTP({schema: _schema, rootValue: root, graphiql: true,})(req, res);
 }
-
-const executor = async ({document, variables}) => {
-    const query = print(document);
-    const fetchResult = await fetch('http://example.com/graphql', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({query, variables})
-    });
-    return fetchResult.json();
-};
-
 
 

@@ -1,6 +1,6 @@
 import {ComManager} from "./transport/ComManager";
-import {UDPLink} from "./transport/Transport";
-import {buildSchema, graphql, introspectionFromSchema} from "graphql";
+import {ResponseMessage, UDPLink} from "./transport/Transport";
+import {buildSchema, graphql} from "graphql";
 
 const app = new ComManager({
     appName: 'theFirstApp',
@@ -28,11 +28,14 @@ const root = {
 };
 
 
-
-// const gql = graphql(schema, '', root)
-
-let schemaIntrospection = introspectionFromSchema(schema);
 app.connectWithPayload({schemaSource: source})
+app.onQuery(async msg => {
+
+    console.log('ON QUERY MSG', msg)
+    const res =  await graphql(schema, msg.payload.query, root, {}, msg.payload.variables)
+    console.log('GQL RES', res)
+    return new ResponseMessage(msg.ref, res)
+})
 // app2.connectWithPayload({greeting: 'YouSuch'})
 
 // setTimeout(() => {

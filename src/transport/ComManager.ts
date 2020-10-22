@@ -80,6 +80,23 @@ export class ComManager extends EventEmitter {
         })
     }
 
+    onQuery(fn: (msg: IncomingMessage) => Promise<ResponseMessage>) {
+
+        this.link.on(LinkEvents.QUERY, (msg: IncomingMessage) => {
+
+            fn(msg)
+                .then(p => {
+                    this.link.sendMessage({
+                        port: msg.sender.port,
+                        name: 'reg' // TODO Useless...
+                    }, p)
+                })
+
+
+        })
+
+    }
+
     connectWithPayload(payload: any) {
         this.link.sendToServer(JSON.stringify({
             peer: {
@@ -97,7 +114,7 @@ export class ComManager extends EventEmitter {
 
         let peer = this.peers.getPeerByName(name);
         const msg = new RequestMessage(peer, {
-            type: LinkEvents.POOP,
+            type: LinkEvents.QUERY, // TODO Should probably not be hardcoded?
             payload: payload
         })
 

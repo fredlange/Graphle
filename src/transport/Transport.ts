@@ -100,7 +100,8 @@ export class ResponseMessage implements Message {
 export enum LinkEvents {
     REPLY = 'reply',
     POOP = 'poop',
-    PING = 'PING'
+    PING = 'PING',
+    QUERY = 'QUERY',
 }
 
 export class UDPLink extends EventEmitter implements Transport {
@@ -158,7 +159,6 @@ export class UDPLink extends EventEmitter implements Transport {
     }
 
     sendToServer(msg: string): void {
-        console.log('Send to server', msg)
         this.socket.send(msg, this.serverPort)
     }
 
