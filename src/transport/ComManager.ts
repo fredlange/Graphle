@@ -2,10 +2,12 @@ import {IncomingMessage, LinkEvents, RequestMessage, ResponseMessage, Transport}
 import {PeerRegistry} from "./Peer";
 import {getRandomInt} from "./DummyUtils";
 import {EventEmitter} from "events";
+import {ComponentRoles} from "../manager/app";
 
 interface ComManagerConfig {
     appName: string
-    link: Transport
+    link: Transport,
+    role: ComponentRoles
 }
 
 export enum ComEvents {
@@ -20,17 +22,19 @@ export class ComManager extends EventEmitter {
     private readonly appName: string
     private readonly link: Transport
     private readonly peers
+    private readonly role: ComponentRoles
 
     constructor(config: ComManagerConfig) {
         super()
         this.appName = config.appName
         this.peers = new PeerRegistry(config.appName)
         this.link = config.link
+        this.role = config.role
 
         this.link.on(LinkEvents.PING, () => {
             this.link.sendToServer(JSON.stringify({
                 type: 'RESPONSE',
-                peer: {
+                component: {
                     name: this.appName
                 },
                 payload: {
@@ -40,38 +44,18 @@ export class ComManager extends EventEmitter {
 
         })
 
-        this.link.on(LinkEvents.POOP, (incomingMessage: IncomingMessage) => {
-
-            const seriousResponse = () => {
-                let responseMessage = new ResponseMessage(
-                    incomingMessage.ref, // Incoming message does not have ID?
-                    {
-                        iHate: 'gesle' + incomingMessage.payload.greeting
-                    }
-                );
-
-                // console.log('Sending:', responseMessage, 'as response to', incomingMessage)
-                this.link.sendMessage({
-                    port: incomingMessage.sender.port,
-                    name: 'reg' // TODO Useless...
-                }, responseMessage)
-            }
-
-            // TODO Only during development to simulate delay
-            setTimeout(() => {
-                seriousResponse()
-            }, getRandomInt(1000, 4000))
-        })
-
         this.link.onMessage(msg => {
             if (!msg.isTyped()) {
+
+                console.log('Message', msg)
+
                 // Untyped only on message from server!
                 // Multiple peers such as initial connect
                 if (Array.isArray(msg.payload)) {
                     this.emit(ComEvents.STATE_REHYDRATE, msg.payload)
                     this.peers.pushMultiplePeers(msg.payload)
                 }
-                // Single peer, on continues connection
+                // Single component, on continues connection
                 else {
                     this.emit(ComEvents.NEW_PEER, msg.payload)
                     this.peers.pushOnNewPeer(msg.payload)
@@ -99,8 +83,9 @@ export class ComManager extends EventEmitter {
 
     connectWithPayload(payload: any) {
         this.link.sendToServer(JSON.stringify({
-            peer: {
-                name: this.appName
+            component: {
+                name: this.appName,
+                role: this.role
             },
             payload: payload
         }))

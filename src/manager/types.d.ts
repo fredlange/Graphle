@@ -1,5 +1,8 @@
+import {ComponentRoles} from "./app";
+
 interface Component extends IConsumer {
     name: string
+    role: ComponentRoles
 }
 
 export interface Peer extends Component, IProducer {
@@ -29,7 +32,7 @@ export interface IMessage {
 }
 
 export interface IMessageInbound extends IMessage {
-    peer: Peer
+    component: Peer
 }
 
 export interface IOutboundMessage extends IMessage{

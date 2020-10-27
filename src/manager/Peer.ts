@@ -1,11 +1,12 @@
-import {Peer} from "./types";
+import {Component, Peer} from "./types";
+import {ComponentRoles} from "./app";
 
-export const PeerRegistry = new (class {
+export const ComponentRegistry = new (class {
 
     private registry: Peer[] = []
 
     constructor() {
-        // setInterval(() => console.log('PEER REGISTRY', this), 2000)
+        // setInterval(() => console.log('COMPONENT REGISTRY', this), 2000)
     }
 
     getAllPeers(): Peer[] {
@@ -13,7 +14,13 @@ export const PeerRegistry = new (class {
     }
 
     getPeersOfPeer(peer: Peer) {
-        return this.registry.filter(p => p.port != peer.port)
+        return this.registry
+            .filter(p => p.port != peer.port)
+    }
+
+    getComponentsOtherThan(peer: Peer) {
+        return this.registry
+            .filter(p => p.port)
     }
 
     pushOnNewPeer(peer: Peer) {
@@ -22,7 +29,7 @@ export const PeerRegistry = new (class {
     }
 
     removePeer(peer: Peer) {
-        console.log('Removing peer:', )
+        console.log('Removing component:', )
         this.registry.splice(this.registry.indexOf(peer), 1)
     }
 
@@ -43,7 +50,7 @@ export const PeerRegistry = new (class {
     }
 
     private pushPeer(peer: Peer) {
-        console.log('Pushing new peer', peer)
+        console.log('Pushing new component', peer)
         this.registry.push(peer)
     }
 

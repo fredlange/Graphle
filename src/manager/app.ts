@@ -1,7 +1,7 @@
 import {createSocket} from 'dgram'
 import {v4 as uuidv4} from 'uuid'
 import {IncomingMessage} from "./IncomingMessage";
-import {PeerRegistry} from "./Peer";
+import {ComponentRegistry} from "./Peer";
 import {RequestRegistry} from "./RequestRegistry";
 import {IOutboundMessage, Peer} from "./types";
 import {LinkEvents} from "../transport/Transport";
@@ -10,11 +10,15 @@ import {LinkEvents} from "../transport/Transport";
  * APP ONE
  */
 
+export enum ComponentRoles {
+    PEER = 'peer',
+    SPECTATOR = 'spectator'
+}
 
 export class UDPClusterManager {
 
     static server = createSocket('udp4')
-    registry = PeerRegistry
+    componentRegistry = ComponentRegistry
     requestRegistry = RequestRegistry
     port = 41236
 
@@ -47,15 +51,15 @@ export class UDPClusterManager {
 
     }
 
-    // TODO
+    // TODO This solution will probably not remove the correct peer...?
     pingPeers() {
         setInterval(async () => {
             // console.log('Ping all peers')
-            for (const p of this.registry.getAllPeers()) {
+            for (const p of this.componentRegistry.getAllPeers()) {
                 try {
                     await this.exchange({}, p, LinkEvents.PING)
                 } catch (e) {
-                    this.registry.removePeer((e as IOutboundMessage).peer)
+                    this.componentRegistry.removePeer((e as IOutboundMessage).peer)
                 }
 
             }
@@ -75,16 +79,28 @@ export class UDPClusterManager {
                         break
                     }
                     default: {
-                        const {peer, payload} = _msg
-                        let peersOfPeer = this.registry.getPeersOfPeer(peer);
-                        for (const p of peersOfPeer) {
-                            this.sendMessage({
-                                ...peer,
-                                ...payload
-                            }, p)
+                        const {component, payload} = _msg
+                        let peersOfPeer = this.componentRegistry.getPeersOfPeer(component);
+
+                        console.log('Peers of peer', peersOfPeer)
+
+                        // Notify all peers of a new component
+                        if (component.role == ComponentRoles.PEER) {
+                            peersOfPeer.forEach(p => {
+                                this.sendMessage({
+                                    ...component,
+                                    ...payload
+                                }, p)
+                            })
                         }
-                        this.sendMessage(peersOfPeer, peer)
-                        this.registry.pushOnNewPeer(peer)
+
+                        // Return peers to the new component
+                        let actualPeersOfPeer = peersOfPeer
+                            .filter(p => p.role == ComponentRoles.PEER);
+                        this.sendMessage(actualPeersOfPeer, component)
+
+                        // Push new component intro componentRegistry
+                        this.componentRegistry.pushOnNewPeer(component)
                     }
 
                 }

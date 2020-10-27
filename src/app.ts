@@ -1,10 +1,12 @@
 import {ComManager} from "./transport/ComManager";
 import {ResponseMessage, UDPLink} from "./transport/Transport";
 import {buildSchema, graphql} from "graphql";
+import {ComponentRoles} from "./manager/app";
 
 const app = new ComManager({
     appName: 'theFirstApp',
-    link: new UDPLink(41236)
+    link: new UDPLink(41236),
+    role: ComponentRoles.PEER
 });
 
 // const app2 = new ComManager({

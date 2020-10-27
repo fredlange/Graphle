@@ -19,7 +19,7 @@ export const PeerRegistry = class {
 
     getPeerByName(name): Peer {
         let peer = this.registry.filter(p => p.name == name)[0];
-        if (!peer) throw 'No peer with name ' + name
+        if (!peer) throw 'No component with name ' + name
         return peer
     }
 

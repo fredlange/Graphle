@@ -1,12 +1,14 @@
 import {ComManager} from "./ComManager";
 import {UDPLink} from "./Transport";
+import {ComponentRoles} from "../manager/app";
 
 export function createDummyApp(name, delayCreationBy) {
     setTimeout(async () => {
         console.log('Creating app with name', name)
         let grAPP = new ComManager({
             appName: name,
-            link: new UDPLink(41236)
+            link: new UDPLink(41236),
+            role: ComponentRoles.PEER
         });
 
 
