@@ -64,7 +64,7 @@ export class ComManager extends EventEmitter {
         })
     }
 
-    onQuery(fn: (msg: IncomingMessage) => Promise<ResponseMessage>) {
+    respondOnQuery(fn: (msg: IncomingMessage) => Promise<ResponseMessage>) {
 
         this.link.on(LinkEvents.QUERY, (msg: IncomingMessage) => {
 

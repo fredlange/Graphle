@@ -4,29 +4,28 @@ import {GrApp} from "./GrApp";
 // Construct a schema, using GraphQL schema language
 let source = `
 type Query {
-    iHate: String
-    seriousHatred: String
+    pooper: String
+    derpderp: String
 }
 `;
 
 // The root provides a resolver function for each API endpoint
 const root = {
-    iHate: async () => {
-        return 'Gesle!!'
+    pooper: async () => {
+        return 'That is true indeed'
     },
-    seriousHatred: async () => {
+    derpderp: async () => {
         const poop = await app.query(`{ iHate }`)
-        console.log('poop', poop)
 
-        return 'ARGH ' + poop.data.iHate;
+        return 'Death to... ' + poop.data.iHate;
 
     }
 };
 
 const app = new GrApp({
-    name: 'theFirstApp',
-    source: source,
-    rootResolver: root
+    name: 'pooperApp',
+    rootResolver: root,
+    source: source
 })
 
 

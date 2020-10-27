@@ -7,6 +7,7 @@
     "start:manager": "ts-node ./src/manager.ts",
     "start:spectator:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/spectator.ts",
     "start:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/app.ts",
+    "start2:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/app2.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
