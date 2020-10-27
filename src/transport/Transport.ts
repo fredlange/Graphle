@@ -14,6 +14,13 @@ export interface Transport extends EventEmitter {
 
 }
 
+export interface StateRehydratePayload {
+    name: string
+    state: {
+        schemaSource: string
+    }
+}
+
 interface Message {
     type: LinkEvents
     payload: any
