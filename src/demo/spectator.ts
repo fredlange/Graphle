@@ -1,10 +1,10 @@
 import express from 'express';
 import {graphqlHTTP} from 'express-graphql';
 import {buildSchema, GraphQLSchema} from 'graphql';
-import {ComEvents, ComManager} from "./transport/ComManager";
-import {StateRehydratePayload, UDPLink} from "./transport/Transport";
-import {ComponentRoles} from "./manager/app";
-import {createSubschema, stitch} from "./graphql/schema";
+import {ComEvents, ComManager} from "../transport/ComManager";
+import {StateRehydratePayload, UDPLink} from "../transport/Transport";
+import {ComponentRoles} from "../manager/app";
+import {createSubschema, stitch} from "../graphql/schema";
 
 const expr = express();
 

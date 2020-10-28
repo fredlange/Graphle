@@ -1,7 +1,5 @@
-import {GrApp} from "./GrApp";
+import {GrApp} from "../GrApp";
 
-
-// Construct a schema, using GraphQL schema language
 let source = `
 type Query {
     iHate: String
