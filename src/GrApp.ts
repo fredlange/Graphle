@@ -3,6 +3,7 @@ import {ResponseMessage, StateRehydratePayload, UDPLink} from "./transport/Trans
 import {ComponentRoles} from "./manager/app";
 import {buildSchema, graphql, GraphQLSchema} from "graphql";
 import {createSubschema, stitch} from "./graphql/schema";
+import {graphqlHTTP} from "express-graphql";
 
 export class GrApp {
 
@@ -51,5 +52,9 @@ export class GrApp {
         let executionResult = await graphql(this._schema, query, this._rootResolver, {}, variables);
         console.log('ex res', executionResult)
         return executionResult
+    }
+
+    makeHttpMiddleware(): (req, res, next) => Promise<void> {
+        return (req, res, _) => graphqlHTTP({schema: this._schema, rootValue: this._rootResolver, graphiql: true,})(req, res)
     }
 }
