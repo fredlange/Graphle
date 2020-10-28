@@ -14,7 +14,7 @@ const root = {
         return 'IamSpectator!';
     },
 };
-const spectator = new GrApp({
+const spectator = new GrApp.Spectator({
     name: 'schemaSpectator',
     rootResolver: root,
     source: source

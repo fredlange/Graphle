@@ -1,7 +1,8 @@
-import {GrApp} from "../GrApp";
 
 
 // Construct a schema, using GraphQL schema language
+import {GrApp} from "../GrApp";
+
 let source = `
 type Query {
     pooper: String
@@ -15,20 +16,17 @@ const root = {
         return 'That is true indeed'
     },
     derpderp: async () => {
-        const poop = await app.query(`{ iHate }`)
+        const poop = await app.Q(`{ iHate }`)
 
         return 'Death to... ' + poop.data.iHate;
 
     }
 };
 
-const app = new GrApp({
-    name: 'pooperApp',
-    rootResolver: root,
-    source: source
-})
-
-
-
-
-
+const app = new GrApp.Peer(
+    {
+        name: 'pooperApp',
+        rootResolver: root,
+        source: source
+    }
+)

@@ -13,21 +13,14 @@ const root = {
         return 'Gesle!!'
     },
     seriousHatred: async () => {
-        const poop = await app.query(`{ iHate }`)
+        const poop = await app.Q(`{ iHate }`)
         console.log('poop', poop)
-
         return 'ARGH ' + poop.data.iHate;
 
     }
 };
-
-const app = new GrApp({
+const app = new GrApp.Peer({
     name: 'theFirstApp',
     source: source,
     rootResolver: root
 })
-
-
-
-
-
