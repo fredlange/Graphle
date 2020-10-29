@@ -1,5 +1,4 @@
-import {Component, Peer} from "./types";
-import {ComponentRoles} from "./app";
+import {Peer} from "./types";
 
 export const ComponentRegistry = new (class {
 
@@ -29,7 +28,7 @@ export const ComponentRegistry = new (class {
     }
 
     removePeer(peer: Peer) {
-        console.log('Removing component:', )
+        console.info('Removing component:', peer.name)
         this.registry.splice(this.registry.indexOf(peer), 1)
     }
 
@@ -50,12 +49,12 @@ export const ComponentRegistry = new (class {
     }
 
     private pushPeer(peer: Peer) {
-        console.log('Pushing new component', peer)
+        console.info('Pushing new component', peer)
         this.registry.push(peer)
     }
 
     private updatePortOfPeer(peer: Peer) {
-        console.log('Updating port of', peer.name, 'to', peer.port)
+        console.info('Updating port of', peer.name, 'to', peer.port)
         this.getPeerByName(peer.name).port = peer.port
     }
 })()
