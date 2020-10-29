@@ -1,6 +1,5 @@
 import {IncomingMessage, LinkEvents, RequestMessage, ResponseMessage, Transport} from "./Transport";
 import {PeerRegistry} from "./Peer";
-import {getRandomInt} from "./DummyUtils";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../manager/app";
 
@@ -31,8 +30,9 @@ export class ComManager extends EventEmitter {
         this.link = config.link
         this.role = config.role
 
-        this.link.on(LinkEvents.PING, () => {
+        this.link.on(LinkEvents.PING, (incMsg: IncomingMessage) => {
             this.link.sendToServer(JSON.stringify({
+                id: incMsg.ref,
                 type: 'RESPONSE',
                 component: {
                     name: this.appName
