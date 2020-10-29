@@ -25,4 +25,4 @@ The spectator provided sets up a graphiql instance to be able to use http to que
 * Manager does not emot even whenever a clients crashes
 * Manager only persist state in memory (needs something more)
 * Introspection query fills upp the UDP buffer
-* Ping does not seem to sync request IDs 
+* Request timeouts are buggy (manager) or absent (peers)
