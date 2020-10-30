@@ -8,7 +8,7 @@
     "start:spectator:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/spectator.ts",
     "start:app1:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/app.ts",
     "start:app2:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/app2.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -20,8 +20,11 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.15",
     "@types/node": "^14.14.0",
+    "jest": "^26.6.1",
     "nodemon": "^2.0.6",
-    "typescript": "^4.0.3"
+    "ts-jest": "^26.4.3",
+    "typescript": "^4.0.5"
   }
 }

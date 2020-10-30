@@ -1,6 +1,6 @@
 import {ClusterManager} from "./ClusterManager";
-import {UDPLink} from "./ClusterLink";
-import {ComponentRoles} from "../manager/app";
+import {UDPLink} from "./link/ClusterLink";
+import {ComponentRoles} from "../cluster-orator/app";
 
 export function createDummyManager(name, delayCreationBy) {
     setTimeout(async () => {

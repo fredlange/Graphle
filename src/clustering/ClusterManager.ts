@@ -1,7 +1,7 @@
-import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./ClusterLink";
+import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./link/ClusterLink";
 import {PeerRegistry} from "./Peer";
 import {EventEmitter} from "events";
-import {ComponentRoles} from "../manager/app";
+import {ComponentRoles} from "../cluster-orator/app";
 
 interface ClusterManagerConfig {
     appName: string

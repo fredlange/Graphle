@@ -1,7 +1,7 @@
 import {createSocket, RemoteInfo, Socket} from "dgram";
-import {Peer} from "./Peer";
+import {Peer} from "../Peer";
 import {EventEmitter} from "events";
-import {getRandomInt} from "./DummyUtils";
+import {getRandomInt} from "../DummyUtils";
 
 export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)
@@ -171,6 +171,10 @@ export class UDPLink extends EventEmitter implements ClusterLink {
 
     sendToServer(msg: string): void {
         this.socket.send(msg, this.serverPort)
+    }
+
+    shutdownLink() {
+        this.socket.close()
     }
 
 

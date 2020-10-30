@@ -1,6 +1,6 @@
 import {stitchSchemas, SubschemaConfig} from "graphql-tools";
 import {buildSchema, GraphQLSchema, print} from "graphql";
-import {ClusterManager} from "../transport/ClusterManager";
+import {ClusterManager} from "../clustering/ClusterManager";
 
 
 export function createSubschema(source: string, remoteName: string, clusterManager: ClusterManager): SubschemaConfig {

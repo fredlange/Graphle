@@ -1,4 +1,4 @@
-import {UDPClusterManager} from "../manager/app";
+import {UDPClusterManager} from "../cluster-orator/app";
 
 const manager = new UDPClusterManager()
 manager.handleMessages()
