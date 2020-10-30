@@ -39,7 +39,7 @@ export namespace GrApp {
                 role: opt.role
             });
 
-            this.comManager.connectWithPayload({schemaSource: opt.source})
+            this.comManager.connectToCluster({schemaSource: opt.source})
 
             this.comManager.on(ComEvents.STATE_REHYDRATE, (payload: StateRehydratePayload[]) => {
                 console.log('PEER REHYDRATES STATE', payload);

@@ -81,7 +81,7 @@ export class ComManager extends EventEmitter {
 
     }
 
-    connectWithPayload(payload: any) {
+    connectToCluster(payload: any) {
         this.link.sendToServer(JSON.stringify({
             component: {
                 name: this.appName,
