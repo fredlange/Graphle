@@ -1,4 +1,4 @@
-import {IncomingMessage, LinkEvents, RequestMessage, ResponseMessage, ClusterLink} from "./ClusterLink";
+import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./ClusterLink";
 import {PeerRegistry} from "./Peer";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../manager/app";
@@ -9,6 +9,9 @@ interface ClusterManagerConfig {
     role: ComponentRoles
 }
 
+/*
+Events emitted by the ClusterManager EventEmitter
+ */
 export enum ClusterEvents {
     NOTIFY_MANAGER = "NOTIFY_MANAGER",
     MESSAGE_FROM_SERVER = "MESSAGE_FROM_SERVER",

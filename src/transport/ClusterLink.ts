@@ -104,6 +104,10 @@ export class ResponseMessage implements Message {
 }
 
 
+/*
+Events emitted by the Link EventEmitter
+TODO These are currently not segregated correctly
+ */
 export enum LinkEvents {
     REPLY = 'reply',
     POOP = 'poop',
