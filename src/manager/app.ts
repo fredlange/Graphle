@@ -4,7 +4,7 @@ import {IncomingMessage} from "./IncomingMessage";
 import {ComponentRegistry} from "./Peer";
 import {RequestRegistry} from "./RequestRegistry";
 import {IOutboundMessage, Peer} from "./types";
-import {LinkEvents} from "../transport/Transport";
+import {LinkEvents} from "../transport/ClusterLink";
 
 /**
  * APP ONE

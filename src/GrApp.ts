@@ -1,5 +1,5 @@
 import {ComEvents, ComManager} from "./transport/ComManager";
-import {ResponseMessage, StateRehydratePayload, UDPLink} from "./transport/Transport";
+import {ResponseMessage, StateRehydratePayload, UDPLink} from "./transport/ClusterLink";
 import {ComponentRoles} from "./manager/app";
 import {buildSchema, graphql, GraphQLSchema} from "graphql";
 import {createSubschema, stitch} from "./graphql/schema";

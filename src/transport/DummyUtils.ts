@@ -1,5 +1,5 @@
 import {ComManager} from "./ComManager";
-import {UDPLink} from "./Transport";
+import {UDPLink} from "./ClusterLink";
 import {ComponentRoles} from "../manager/app";
 
 export function createDummyApp(name, delayCreationBy) {

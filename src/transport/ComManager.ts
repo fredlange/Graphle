@@ -1,11 +1,11 @@
-import {IncomingMessage, LinkEvents, RequestMessage, ResponseMessage, Transport} from "./Transport";
+import {IncomingMessage, LinkEvents, RequestMessage, ResponseMessage, ClusterLink} from "./ClusterLink";
 import {PeerRegistry} from "./Peer";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../manager/app";
 
 interface ComManagerConfig {
     appName: string
-    link: Transport,
+    link: ClusterLink,
     role: ComponentRoles
 }
 
@@ -19,7 +19,7 @@ export enum ComEvents {
 export class ComManager extends EventEmitter {
 
     private readonly appName: string
-    private readonly link: Transport
+    private readonly link: ClusterLink
     private readonly peers
     private readonly role: ComponentRoles
 

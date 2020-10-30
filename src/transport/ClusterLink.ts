@@ -3,7 +3,7 @@ import {Peer} from "./Peer";
 import {EventEmitter} from "events";
 import {getRandomInt} from "./DummyUtils";
 
-export interface Transport extends EventEmitter {
+export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)
 
     sendMessage(peer: Peer, msg: Message)
@@ -111,7 +111,7 @@ export enum LinkEvents {
     QUERY = 'QUERY',
 }
 
-export class UDPLink extends EventEmitter implements Transport {
+export class UDPLink extends EventEmitter implements ClusterLink {
 
     private readonly serverPort: number
     private socket: Socket
