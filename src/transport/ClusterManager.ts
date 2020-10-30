@@ -3,27 +3,27 @@ import {PeerRegistry} from "./Peer";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../manager/app";
 
-interface ComManagerConfig {
+interface ClusterManagerConfig {
     appName: string
     link: ClusterLink,
     role: ComponentRoles
 }
 
-export enum ComEvents {
+export enum ClusterEvents {
     NOTIFY_MANAGER = "NOTIFY_MANAGER",
     MESSAGE_FROM_SERVER = "MESSAGE_FROM_SERVER",
     NEW_PEER = 'NEW_PEER',
     STATE_REHYDRATE = "STATE_REHYDRATE"
 }
 
-export class ComManager extends EventEmitter {
+export class ClusterManager extends EventEmitter {
 
     private readonly appName: string
     private readonly link: ClusterLink
     private readonly peers
     private readonly role: ComponentRoles
 
-    constructor(config: ComManagerConfig) {
+    constructor(config: ClusterManagerConfig) {
         super()
         this.appName = config.appName
         this.peers = new PeerRegistry(config.appName)
@@ -52,12 +52,12 @@ export class ComManager extends EventEmitter {
                 // Untyped only on message from server!
                 // Multiple peers such as initial connect
                 if (Array.isArray(msg.payload)) {
-                    this.emit(ComEvents.STATE_REHYDRATE, msg.payload)
+                    this.emit(ClusterEvents.STATE_REHYDRATE, msg.payload)
                     this.peers.pushMultiplePeers(msg.payload)
                 }
                 // Single component, on continues connection
                 else {
-                    this.emit(ComEvents.NEW_PEER, msg.payload)
+                    this.emit(ClusterEvents.NEW_PEER, msg.payload)
                     this.peers.pushOnNewPeer(msg.payload)
                 }
             }

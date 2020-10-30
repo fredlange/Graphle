@@ -1,13 +1,13 @@
 import {stitchSchemas, SubschemaConfig} from "graphql-tools";
 import {buildSchema, GraphQLSchema, print} from "graphql";
-import {ComManager} from "../transport/ComManager";
+import {ClusterManager} from "../transport/ClusterManager";
 
 
-export function createSubschema(source: string, remoteName: string, coms: ComManager): SubschemaConfig {
+export function createSubschema(source: string, remoteName: string, clusterManager: ClusterManager): SubschemaConfig {
     return {
         schema: buildSchema(source),
         executor: async ({document, variables}) =>
-            await coms._exchange(remoteName, {
+            await clusterManager._exchange(remoteName, {
                 query: print(document), variables
             })
 

@@ -1,4 +1,4 @@
-import {ComEvents, ComManager} from "./transport/ComManager";
+import {ClusterEvents, ClusterManager} from "./transport/ClusterManager";
 import {ResponseMessage, StateRehydratePayload, UDPLink} from "./transport/ClusterLink";
 import {ComponentRoles} from "./manager/app";
 import {buildSchema, graphql, GraphQLSchema} from "graphql";
@@ -16,7 +16,7 @@ export namespace GrApp {
 
     interface IComponent {
         readonly options: ComponentOptions
-        readonly comManager: ComManager
+        readonly clusterManager: ClusterManager
         readonly _rootResolver: any
         _schema: GraphQLSchema
     }
@@ -24,7 +24,7 @@ export namespace GrApp {
     abstract class Component implements IComponent {
 
         readonly options: ComponentOptions
-        readonly comManager: ComManager
+        readonly clusterManager: ClusterManager
         readonly _rootResolver: any
         _schema: GraphQLSchema
 
@@ -33,30 +33,30 @@ export namespace GrApp {
 
             this._schema = buildSchema(opt.source);
             this._rootResolver = opt.rootResolver
-            this.comManager = new ComManager({
+            this.clusterManager = new ClusterManager({
                 appName: opt.name,
                 link: new UDPLink(41236),
                 role: opt.role
             });
 
-            this.comManager.connectToCluster({schemaSource: opt.source})
+            this.clusterManager.connectToCluster({schemaSource: opt.source})
 
-            this.comManager.on(ComEvents.STATE_REHYDRATE, (payload: StateRehydratePayload[]) => {
+            this.clusterManager.on(ClusterEvents.STATE_REHYDRATE, (payload: StateRehydratePayload[]) => {
                 console.log('PEER REHYDRATES STATE', payload);
                 payload.forEach(p => {
-                    this._schema = stitch(this._schema, createSubschema(p.state.schemaSource, p.name, this.comManager));
+                    this._schema = stitch(this._schema, createSubschema(p.state.schemaSource, p.name, this.clusterManager));
                     console.log('NEW SCHEMA SET');
                 })
             })
-            this.comManager.on(ComEvents.NEW_PEER, (event) => {
+            this.clusterManager.on(ClusterEvents.NEW_PEER, (event) => {
                 console.log('SPECTATOR NOTICED A NEW COMPONENT');
                 console.log('EVENT', event)
-                this._schema = stitch(this._schema, createSubschema(event.schemaSource, event.name, this.comManager));
+                this._schema = stitch(this._schema, createSubschema(event.schemaSource, event.name, this.clusterManager));
                 console.log('NEW SCHEMA SET');
             });
 
 
-            this.comManager.respondOnQuery(async msg => {
+            this.clusterManager.respondOnQuery(async msg => {
 
 
                 console.log('ON QUERY MSG', msg)

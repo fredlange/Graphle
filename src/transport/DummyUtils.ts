@@ -1,11 +1,11 @@
-import {ComManager} from "./ComManager";
+import {ClusterManager} from "./ClusterManager";
 import {UDPLink} from "./ClusterLink";
 import {ComponentRoles} from "../manager/app";
 
-export function createDummyApp(name, delayCreationBy) {
+export function createDummyManager(name, delayCreationBy) {
     setTimeout(async () => {
         console.log('Creating app with name', name)
-        let grAPP = new ComManager({
+        const clusterManager = new ClusterManager({
             appName: name,
             link: new UDPLink(41236),
             role: ComponentRoles.PEER
@@ -16,7 +16,7 @@ export function createDummyApp(name, delayCreationBy) {
 
             setTimeout(async () => {
 
-                const res1 = await grAPP._exchange('AppTwo', {
+                const res1 = await clusterManager._exchange('AppTwo', {
                     greeting: 'HELLLOOOOO'
                 })
                 console.log('Response from AppTwo, HELLOOO', res1)
@@ -25,7 +25,7 @@ export function createDummyApp(name, delayCreationBy) {
             }, 2000)
 
             setTimeout(async () => {
-                const res2 = await grAPP._exchange('AppTwo', {
+                const res2 = await clusterManager._exchange('AppTwo', {
                     greeting: 'FUUUU'
                 })
 
