@@ -1,43 +1,5 @@
-import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
-import {Peer} from "../Peer";
-import PromiseController from 'promise-controller';
-
-class ExchangeableLink extends UDPLink {
-
-    /*
-    Store controlled promises by id
-     */
-    private inflightRequests = {}
-
-    constructor(opt: { linkPort?: number, serverPort: number }) {
-        super(opt);
-        this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
-            // TODO What if the reply ref does not exists?
-            console.log('REPLY EVENT TRIGGERED!', reply)
-            try {
-                const req = this.inflightRequests[reply.ref]
-
-                if(req) {
-                    req.resolve(reply)
-                }
-            } catch (e) {
-                console.log('Error', e)
-                // this.inflightRequests[reply.ref].reject()
-
-            }
-        })
-
-    }
-
-    exchange(peer: Peer, msg: RequestMessage): Promise<IncomingMessage> {
-        const pc = new PromiseController();
-        this.inflightRequests[msg.id] = pc
-        // wtf...?
-        pc.call(() => 'FUUUUU')
-        return this.inflightRequests[msg.id].promise;
-    }
-
-}
+import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage} from "./ClusterLink";
+import {ExchangeableLink} from "./ExchangeableLink";
 
 describe('ClusterLink', () => {
     const RECIPIANT_PORT = 1337;
@@ -46,14 +8,32 @@ describe('ClusterLink', () => {
     beforeEach(() => {
         link = new ExchangeableLink({linkPort: RECIPIANT_PORT, serverPort: 9999})
     })
-    afterAll(() => {
+    afterEach(() => {
         link.shutdownLink()
     })
 
     describe('exchange', () => {
 
-        xtest('should send message ', () => {
-            expect('to').toBe('poop')
+        test('should send message ', async (done) => {
+
+            let msg = {
+                id: 'UniqueId',
+                payload: {
+                    request: true
+                },
+                sender: {port: RECIPIANT_PORT},
+                type: LinkEvents.EXCHANGE_MSG
+            } as RequestMessage;
+
+            const incomingMessage = makeIncomingMessage(msg, RECIPIANT_PORT)
+
+            link.on(LinkEvents.EXCHANGE_MSG, d => {
+                expect(d).toStrictEqual(incomingMessage)
+                done()
+            })
+
+            await link.exchange({port: RECIPIANT_PORT, name: 'AnyPeer'}, msg)
+
         })
 
         xtest('should store request as inflightRequest ', () => {
@@ -63,7 +43,6 @@ describe('ClusterLink', () => {
         describe('on ' + LinkEvents.REPLY, () => {
 
             test('should resolve with message payload', async (done) => {
-
                 let msg = {
                     id: 'UniqueId',
                     payload: {
@@ -72,15 +51,7 @@ describe('ClusterLink', () => {
                     sender: {port: RECIPIANT_PORT},
                     type: LinkEvents.REPLY
                 } as RequestMessage;
-
-                const _bugg = new Buffer(JSON.stringify(msg))
-
-                let incomingMessage = new IncomingMessage(_bugg, {
-                    port: RECIPIANT_PORT,
-                    address: 'localhost',
-                    family: "IPv4",
-                    size: 1335
-                });
+                let incomingMessage = makeIncomingMessage(msg, RECIPIANT_PORT)
 
                 // Fake response
                 setTimeout(() => {
@@ -89,13 +60,12 @@ describe('ClusterLink', () => {
 
 
                 const poop = await link.exchange({port: RECIPIANT_PORT, name: 'AnyPeer'}, msg)
-                expect(poop).toBe(incomingMessage)
+                expect(poop).toStrictEqual(incomingMessage)
 
                 done()
             })
 
             xtest('should only emit once', async (done) => {
-
 
                 let msg = {
                     id: 'UniqueId',
@@ -106,14 +76,8 @@ describe('ClusterLink', () => {
                     type: LinkEvents.REPLY
                 } as RequestMessage;
 
-                const _bugg = new Buffer(JSON.stringify(msg))
 
-                let incomingMessage = new IncomingMessage(_bugg, {
-                    port: RECIPIANT_PORT,
-                    address: 'localhost',
-                    family: "IPv4",
-                    size: 1335
-                });
+                let incomingMessage = makeIncomingMessage(msg, RECIPIANT_PORT)
 
                 // First response
                 setTimeout(() => {
@@ -148,3 +112,21 @@ describe('ClusterLink', () => {
 
 })
 
+
+function makeIncomingMessage(msg: RequestMessage, port: number): IncomingMessage {
+    // let _msg = {
+    //     id: 'UniqueId',
+    //     payload: {
+    //         response: true
+    //     },
+    //     sender: {port: port},
+    //     type: LinkEvents.REPLY
+    // } as RequestMessage;
+
+    return new IncomingMessage(new Buffer(JSON.stringify(msg)), {
+        port: port,
+        address: 'localhost',
+        family: "IPv4",
+        size: 1335
+    })
+}

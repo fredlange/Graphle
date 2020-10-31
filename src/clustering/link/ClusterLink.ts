@@ -110,6 +110,7 @@ TODO These are currently not segregated correctly
  */
 export enum LinkEvents {
     REPLY = 'reply',
+    EXCHANGE_MSG = 'exchange_msg',
     POOP = 'poop',
     PING = 'PING',
     QUERY = 'QUERY',
