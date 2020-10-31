@@ -7,7 +7,7 @@ export function createDummyManager(name, delayCreationBy) {
         console.log('Creating app with name', name)
         const clusterManager = new ClusterManager({
             appName: name,
-            link: new UDPLink(41236),
+            link: new UDPLink({serverPort: 41236}),
             role: ComponentRoles.PEER
         });
 
@@ -40,7 +40,6 @@ export function createDummyManager(name, delayCreationBy) {
 
 
 }
-
 
 
 /**
