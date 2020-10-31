@@ -39,11 +39,12 @@ export class ExchangeableLink extends UDPLink {
         return this.inflightRequests[msg.id].promise
             .catch(e => {
                 if (e.message == timeoutReasonCode) {
-                    console.log('DARN ERROR', e)
                     this.emit(LinkEvents.TIMEOUT, {
                         code: LinkErrorReasons.TIMEOUT,
                         msg: msg
                     } as ErrorMessage)
+                } else {
+                    throw e
                 }
             });
     }

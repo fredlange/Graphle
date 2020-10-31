@@ -56,10 +56,10 @@ describe('ClusterLink', () => {
                 done()
             })
 
-            xtest('should only emit once', async (done) => {
+            test('should only emit once', async (done) => {
 
                 let msg = {
-                    id: 'uniqueId',
+                    id: 'uniqueId123',
                     payload: {
                         response: true
                     },
@@ -70,16 +70,18 @@ describe('ClusterLink', () => {
                 let originalIncomingMessage = makeIncomingMessage(msg, RECIPIENT_PORT)
 
                 // First response
-                setTimeout(() => link.emit(LinkEvents.REPLY, originalIncomingMessage), 1000)
+                setTimeout(() => link.emit(LinkEvents.REPLY, originalIncomingMessage), 200)
 
                 // Second response
                 setTimeout(() => link.emit(LinkEvents.REPLY, {
                     ...originalIncomingMessage,
-                    ref: 'Second' // Override original ref with something else
-                } as IncomingMessage), 5000)
+                    payload: {
+                        invalidPayload: true
+                    }
+                } as IncomingMessage), 300)
 
                 const res = await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, msg)
-                expect(res).toBe(originalIncomingMessage)
+                expect(res).toStrictEqual(originalIncomingMessage)
 
                 done()
 
