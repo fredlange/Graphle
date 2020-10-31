@@ -13,17 +13,14 @@ export class ExchangeableLink extends UDPLink {
         super(opt);
         this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
             // TODO What if the reply ref does not exists?
-            console.log('REPLY EVENT TRIGGERED!', reply)
             try {
                 const req = this.inflightRequests[reply.ref]
-
                 if (req) {
+                    delete this.inflightRequests[reply.ref]
                     req.resolve(reply)
                 }
             } catch (e) {
                 console.log('Error', e)
-                // this.inflightRequests[reply.ref].reject()
-
             }
         })
 
@@ -36,6 +33,11 @@ export class ExchangeableLink extends UDPLink {
         pc.call(() => 'FUUUUU')
         this.sendMessage(peer, msg)
         return this.inflightRequests[msg.id].promise;
+    }
+
+    _isInFlight(id): boolean {
+        console.log('In flight', this.inflightRequests)
+        return this.inflightRequests.hasOwnProperty(id)
     }
 
 }

@@ -4,53 +4,60 @@ import {ExchangeableLink} from "./ExchangeableLink";
 describe('ClusterLink', () => {
     const RECIPIANT_PORT = 1337;
     let link: ExchangeableLink
+    const DUMMY_REQUEST_MESSAGE = {
+        id: 'uniqueId',
+        payload: {
+            request: true
+        },
+        sender: {port: RECIPIANT_PORT},
+        type: LinkEvents.EXCHANGE_MSG
+    } as RequestMessage;
 
     beforeEach(() => {
         link = new ExchangeableLink({linkPort: RECIPIANT_PORT, serverPort: 9999})
     })
     afterEach(() => {
         link.shutdownLink()
+        link.removeAllListeners()
     })
 
     describe('exchange', () => {
 
         test('should send message ', async (done) => {
 
-            let msg = {
-                id: 'UniqueId',
-                payload: {
-                    request: true
-                },
-                sender: {port: RECIPIANT_PORT},
-                type: LinkEvents.EXCHANGE_MSG
-            } as RequestMessage;
 
-            const incomingMessage = makeIncomingMessage(msg, RECIPIANT_PORT)
+            const incomingMessage = makeIncomingMessage(DUMMY_REQUEST_MESSAGE, RECIPIANT_PORT)
 
             link.on(LinkEvents.EXCHANGE_MSG, d => {
                 expect(d).toStrictEqual(incomingMessage)
                 done()
             })
 
-            await link.exchange({port: RECIPIANT_PORT, name: 'AnyPeer'}, msg)
+            await link.exchange({port: RECIPIANT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
 
         })
 
-        xtest('should store request as inflightRequest ', () => {
-            expect('to').toBe('poop')
+        test('should store request as in flight Request ', async (done) => {
+            link.on(LinkEvents.EXCHANGE_MSG, d => {
+                expect(link._isInFlight(d.ref)).toBeTruthy()
+                done()
+            })
+            await link.exchange({port: RECIPIANT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
+
         })
 
         describe('on ' + LinkEvents.REPLY, () => {
 
             test('should resolve with message payload', async (done) => {
                 let msg = {
-                    id: 'UniqueId',
+                    id: 'uniqueId',
                     payload: {
                         response: true
                     },
                     sender: {port: RECIPIANT_PORT},
                     type: LinkEvents.REPLY
                 } as RequestMessage;
+
                 let incomingMessage = makeIncomingMessage(msg, RECIPIANT_PORT)
 
                 // Fake response
@@ -68,7 +75,7 @@ describe('ClusterLink', () => {
             xtest('should only emit once', async (done) => {
 
                 let msg = {
-                    id: 'UniqueId',
+                    id: 'uniqueId',
                     payload: {
                         response: true
                     },
@@ -99,6 +106,15 @@ describe('ClusterLink', () => {
                 done()
 
             })
+
+            test('should remove request from in flight object ', async (done) => {
+                link.on(LinkEvents.EXCHANGE_MSG, d => {
+                    link.emit(LinkEvents.REPLY, makeIncomingMessage(d, RECIPIANT_PORT))
+                })
+                const res = await link.exchange({port: RECIPIANT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
+                expect(link._isInFlight(res.ref)).toBeFalsy()
+                done()
+            })
         })
 
 
@@ -114,15 +130,6 @@ describe('ClusterLink', () => {
 
 
 function makeIncomingMessage(msg: RequestMessage, port: number): IncomingMessage {
-    // let _msg = {
-    //     id: 'UniqueId',
-    //     payload: {
-    //         response: true
-    //     },
-    //     sender: {port: port},
-    //     type: LinkEvents.REPLY
-    // } as RequestMessage;
-
     return new IncomingMessage(new Buffer(JSON.stringify(msg)), {
         port: port,
         address: 'localhost',
