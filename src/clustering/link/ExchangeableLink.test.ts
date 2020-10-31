@@ -1,7 +1,7 @@
-import {ClusterLink, ErrorMessage, IncomingMessage, LinkEvents, RequestMessage} from "./ClusterLink";
+import {ErrorMessage, IncomingMessage, LinkEvents, RequestMessage} from "./ClusterLink";
 import {ExchangeableLink} from "./ExchangeableLink";
 
-describe('ClusterLink', () => {
+describe('ExchangeableLink', () => {
     const RECIPIENT_PORT = 1337;
     let link: ExchangeableLink
     const DUMMY_REQUEST_MESSAGE = {
