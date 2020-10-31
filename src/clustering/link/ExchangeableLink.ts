@@ -1,4 +1,4 @@
-import {IncomingMessage, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
+import {ErrorMessage, IncomingMessage, LinkErrorReasons, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
 import {Peer} from "../Peer";
 import PromiseController from 'promise-controller';
 
@@ -20,19 +20,32 @@ export class ExchangeableLink extends UDPLink {
                     req.resolve(reply)
                 }
             } catch (e) {
-                console.log('Error', e)
+                console.log('Error during Reply handling', e)
             }
         })
 
     }
 
     exchange(peer: Peer, msg: RequestMessage): Promise<IncomingMessage> {
-        const pc = new PromiseController();
+        const timeoutReasonCode = 'NO_REPLY';
+
+        const pc = new PromiseController({
+            timeout: 1000, // TODO: Should not be hardcoded later on. Will do for now
+            timeoutReason: timeoutReasonCode
+        });
         this.inflightRequests[msg.id] = pc
-        // wtf...?
-        pc.call(() => 'FUUUUU')
-        this.sendMessage(peer, msg)
-        return this.inflightRequests[msg.id].promise;
+        pc.call(() => this.sendMessage(peer, msg))
+
+        return this.inflightRequests[msg.id].promise
+            .catch(e => {
+                if (e.message == timeoutReasonCode) {
+                    console.log('DARN ERROR', e)
+                    this.emit(LinkEvents.TIMEOUT, {
+                        code: LinkErrorReasons.TIMEOUT,
+                        msg: msg
+                    } as ErrorMessage)
+                }
+            });
     }
 
     _isInFlight(id): boolean {

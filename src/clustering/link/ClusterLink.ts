@@ -111,6 +111,7 @@ TODO These are currently not segregated correctly
 export enum LinkEvents {
     REPLY = 'reply',
     EXCHANGE_MSG = 'exchange_msg',
+    TIMEOUT = 'timeout',
     POOP = 'poop',
     PING = 'PING',
     QUERY = 'QUERY',
@@ -119,6 +120,14 @@ export enum LinkEvents {
 export interface LinkOptions {
     serverPort: number
     linkPort?: number
+}
+export enum LinkErrorReasons {
+    TIMEOUT = 'NO_REPLY_IN_TIME'
+}
+
+export interface ErrorMessage {
+    code: LinkErrorReasons,
+    msg: Message
 }
 export class UDPLink extends EventEmitter implements ClusterLink {
 

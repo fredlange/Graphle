@@ -1,4 +1,4 @@
-import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage} from "./ClusterLink";
+import {ClusterLink, ErrorMessage, IncomingMessage, LinkEvents, RequestMessage} from "./ClusterLink";
 import {ExchangeableLink} from "./ExchangeableLink";
 
 describe('ClusterLink', () => {
@@ -24,17 +24,12 @@ describe('ClusterLink', () => {
     describe('exchange', () => {
 
         test('should send message ', async (done) => {
-
-
             const incomingMessage = makeIncomingMessage(DUMMY_REQUEST_MESSAGE, RECIPIENT_PORT)
-
             link.on(LinkEvents.EXCHANGE_MSG, d => {
                 expect(d).toStrictEqual(incomingMessage)
                 done()
             })
-
             await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
-
         })
 
         test('should store request as in flight Request ', async (done) => {
@@ -43,7 +38,6 @@ describe('ClusterLink', () => {
                 done()
             })
             await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
-
         })
 
         describe('on ' + LinkEvents.REPLY, () => {
@@ -55,7 +49,6 @@ describe('ClusterLink', () => {
                 setTimeout(() => {
                     link.emit(LinkEvents.REPLY, incomingMessage)
                 }, 1000)
-
 
                 const poop = await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
                 expect(poop).toStrictEqual(incomingMessage)
@@ -74,25 +67,19 @@ describe('ClusterLink', () => {
                     type: LinkEvents.REPLY
                 } as RequestMessage;
 
-
-                let incomingMessage = makeIncomingMessage(msg, RECIPIENT_PORT)
+                let originalIncomingMessage = makeIncomingMessage(msg, RECIPIENT_PORT)
 
                 // First response
-                setTimeout(() => {
-                    link.emit(LinkEvents.REPLY, incomingMessage)
-                }, 1000)
+                setTimeout(() => link.emit(LinkEvents.REPLY, originalIncomingMessage), 1000)
 
                 // Second response
-                setTimeout(() => {
-                    link.emit(LinkEvents.REPLY, {
-                        ...incomingMessage,
-                        ref: 'Second' // Override original ref with something else
-                    } as IncomingMessage)
-                }, 5000)
-
+                setTimeout(() => link.emit(LinkEvents.REPLY, {
+                    ...originalIncomingMessage,
+                    ref: 'Second' // Override original ref with something else
+                } as IncomingMessage), 5000)
 
                 const res = await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, msg)
-                expect(res).toBe(incomingMessage)
+                expect(res).toBe(originalIncomingMessage)
 
                 done()
 
@@ -109,8 +96,29 @@ describe('ClusterLink', () => {
         })
 
 
-        xtest('should timeout ', () => {
-            expect('to').toBe('poop')
+        describe('on request timeout', () => {
+
+            test('should emit timeout event ', async (done) => {
+                link.on(LinkEvents.EXCHANGE_MSG, d => {
+                    setTimeout(() => {
+                        link.emit(LinkEvents.REPLY, makeIncomingMessage(d, RECIPIENT_PORT))
+                    }, 2000)
+                })
+                link.on(LinkEvents.TIMEOUT, (msg: ErrorMessage) => {
+                    expect(msg).toStrictEqual({
+                            code: 'NO_REPLY_IN_TIME',
+                            msg: {
+                                id: 'uniqueId',
+                                payload: {request: true},
+                                sender: {port: 1337},
+                                type: 'exchange_msg'
+                            }
+                        }
+                    )
+                    done()
+                })
+                await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE);
+            })
         })
 
 
