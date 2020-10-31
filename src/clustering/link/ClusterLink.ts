@@ -115,14 +115,18 @@ export enum LinkEvents {
     QUERY = 'QUERY',
 }
 
+export interface LinkOptions {
+    serverPort: number
+    linkPort?: number
+}
 export class UDPLink extends EventEmitter implements ClusterLink {
 
     private readonly serverPort: number
     private socket: Socket
 
-    constructor(serverPort: number) {
+    constructor(opt: LinkOptions) {
         super()
-        this.serverPort = serverPort
+        this.serverPort = opt.serverPort
         this.socket = createSocket('udp4')
         this.socket
             .on('connect', () => console.log('Connected'))
@@ -130,7 +134,7 @@ export class UDPLink extends EventEmitter implements ClusterLink {
                 const address = this.socket.address();
                 console.log(`Peer listening ${address.address}:${address.port}`);
             })
-            .bind()
+            .bind(opt.linkPort)
 
         this.setupMessageResponseHandler()
 
