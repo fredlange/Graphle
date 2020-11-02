@@ -51,7 +51,7 @@ describe('ExchangeableLink', () => {
                 }, 1000)
 
                 const poop = await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, DUMMY_REQUEST_MESSAGE)
-                expect(poop).toStrictEqual(incomingMessage)
+                expect(poop).toStrictEqual(incomingMessage.payload)
 
                 done()
             })
@@ -81,7 +81,7 @@ describe('ExchangeableLink', () => {
                 } as IncomingMessage), 300)
 
                 const res = await link.exchange({port: RECIPIENT_PORT, name: 'AnyPeer'}, msg)
-                expect(res).toStrictEqual(originalIncomingMessage)
+                expect(res).toStrictEqual(originalIncomingMessage.payload)
 
                 done()
 

@@ -13,14 +13,15 @@ export class ExchangeableLink extends UDPLink {
         super(opt);
         this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
             // TODO What if the reply ref does not exists?
+            const req = this.inflightRequests[reply.ref]
             try {
-                const req = this.inflightRequests[reply.ref]
                 if (req) {
                     delete this.inflightRequests[reply.ref]
-                    req.resolve(reply)
+                    req.resolve(reply.payload)
                 }
             } catch (e) {
                 console.log('Error during Reply handling', e)
+                req.reject(e)
             }
         })
 

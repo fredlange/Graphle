@@ -1,9 +1,10 @@
 import {ClusterEvents, ClusterManager} from "./clustering/ClusterManager";
-import {ResponseMessage, StateRehydratePayload, UDPLink} from "./clustering/link/ClusterLink";
+import {ResponseMessage, StateRehydratePayload} from "./clustering/link/ClusterLink";
 import {ComponentRoles} from "./cluster-orator/app";
 import {buildSchema, graphql, GraphQLSchema} from "graphql";
 import {createSubschema, stitch} from "./graphql/schema";
 import {graphqlHTTP} from "express-graphql";
+import {ExchangeableLink} from "./clustering/link/ExchangeableLink";
 
 export namespace GrApp {
 
@@ -35,7 +36,7 @@ export namespace GrApp {
             this._rootResolver = opt.rootResolver
             this.clusterManager = new ClusterManager({
                 appName: opt.name,
-                link: new UDPLink(41236),
+                link: new ExchangeableLink({serverPort: 41236}),
                 role: opt.role
             });
 
@@ -102,7 +103,8 @@ export namespace GrApp {
          * Spectate events in the app and do things
          * TODO Implement
          */
-        on() {}
+        on() {
+        }
 
         makeHttpMiddleware(): (req, res, next) => Promise<void> {
             return super.makeHttpMiddleware();
