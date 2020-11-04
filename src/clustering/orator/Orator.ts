@@ -1,6 +1,6 @@
-import {ExchangeableLink} from "../clustering/link/ExchangeableLink";
-import {ClusterManager} from "../clustering/ClusterManager";
-import {ComponentRoles} from "./app";
+import {ClusterManager} from "../ClusterManager";
+import {ComponentRoles} from "../../cluster-orator/app";
+import {ExchangeableLink} from "../link/ExchangeableLink";
 
 
 export class Orator extends ClusterManager {
