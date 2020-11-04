@@ -23,7 +23,7 @@ export class ClusterManager extends EventEmitter {
 
     private readonly appName: string
     private readonly link: ClusterLink
-    private readonly peers
+    protected readonly peers
     private readonly role: ComponentRoles
 
     constructor(config: ClusterManagerConfig) {
