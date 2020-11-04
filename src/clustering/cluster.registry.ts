@@ -5,10 +5,12 @@ export interface Peer {
 }
 
 export interface IPeerRegistry {
-    getPeerByName(name): Peer
-    pushMultiplePeers(peers: Peer[])
     getAllPeers(): Peer[]
+    getPeerByName(name): Peer
     getPeersOfPeer(peer: Peer)
-    pushPeer(peer: Peer)
+
+    pushOnNewPeer(peer: Peer)
+    pushMultiplePeers(peers: Peer[])
+
     removePeer(peer: Peer)
 }

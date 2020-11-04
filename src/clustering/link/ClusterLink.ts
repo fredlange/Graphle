@@ -1,7 +1,7 @@
 import {createSocket, RemoteInfo, Socket} from "dgram";
-import {Peer} from "../Peer";
 import {EventEmitter} from "events";
 import {getRandomInt} from "../DummyUtils";
+import {Peer} from "../cluster.registry";
 
 export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)

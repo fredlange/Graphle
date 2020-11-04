@@ -1,10 +1,11 @@
 import {createSocket} from 'dgram'
 import {v4 as uuidv4} from 'uuid'
 import {IncomingMessage} from "./IncomingMessage";
-import {ComponentRegistry} from "./Peer";
 import {RequestRegistry} from "./RequestRegistry";
-import {IOutboundMessage, Peer} from "./types";
+import {IOutboundMessage} from "./types";
 import {LinkEvents} from "../clustering/link/ClusterLink";
+import {IPeerRegistry, Peer} from "../clustering/cluster.registry";
+import {PeerRegistry} from "../clustering/PeerRegistry";
 
 /**
  * APP ONE
@@ -18,7 +19,8 @@ export enum ComponentRoles {
 export class UDPClusterManager {
 
     static server = createSocket('udp4')
-    componentRegistry = ComponentRegistry
+    componentRegistry: IPeerRegistry
+        = new PeerRegistry('UDPClusterManager')
     requestRegistry = RequestRegistry
     port = 41236
 

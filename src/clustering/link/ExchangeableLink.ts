@@ -1,6 +1,6 @@
 import {ErrorMessage, IncomingMessage, LinkErrorReasons, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
-import {Peer} from "../Peer";
 import PromiseController from 'promise-controller';
+import {Peer} from "../cluster.registry";
 
 export class ExchangeableLink extends UDPLink {
 

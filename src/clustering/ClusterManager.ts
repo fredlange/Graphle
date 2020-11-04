@@ -1,7 +1,8 @@
 import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./link/ClusterLink";
-import {PeerRegistry} from "./Peer";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../cluster-orator/app";
+import {IPeerRegistry} from "./cluster.registry";
+import {PeerRegistry} from "./PeerRegistry";
 
 interface ClusterManagerConfig {
     appName: string
@@ -23,7 +24,7 @@ export class ClusterManager extends EventEmitter {
 
     private readonly appName: string
     private readonly link: ClusterLink
-    protected readonly peers
+    protected readonly peers: IPeerRegistry
     private readonly role: ComponentRoles
 
     constructor(config: ClusterManagerConfig) {

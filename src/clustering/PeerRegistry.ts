@@ -40,6 +40,10 @@ export class PeerRegistry implements IPeerRegistry {
         this.registry.splice(this.registry.indexOf(peer), 1)
     }
 
+    pushPeer(peer: Peer) {
+        console.info('Pushing new component', peer)
+        this.registry.push(peer)
+    }
 
     private isKnownByName(peer: Peer): boolean {
         return this.registry
@@ -51,11 +55,6 @@ export class PeerRegistry implements IPeerRegistry {
         return this.registry
             .filter(p => p.port == peer.port)
             .length > 0
-    }
-
-    private pushPeer(peer: Peer) {
-        console.info('Pushing new component', peer)
-        this.registry.push(peer)
     }
 
     private updatePortOfPeer(peer: Peer) {
