@@ -20,8 +20,8 @@ export class Orator extends ClusterManager {
     }
 
     pingPeers() {
-        super.peers.forEach(p => {
-            super._exchange(p, {})
+        super.peers.getAllComponents().forEach(p => {
+            super._exchange(p.name, {})
                 .catch(e => {
                     console.log('Need to remove peer', e)
                 })

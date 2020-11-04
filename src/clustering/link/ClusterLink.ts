@@ -1,16 +1,16 @@
 import {createSocket, RemoteInfo, Socket} from "dgram";
 import {EventEmitter} from "events";
 import {getRandomInt} from "../DummyUtils";
-import {Peer} from "../cluster.registry";
+import {Component} from "../cluster.registry";
 
 export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)
 
-    sendMessage(peer: Peer, msg: Message)
+    sendMessage(peer: Component, msg: Message)
 
     sendToServer(msg: string)
 
-    exchange(peer: Peer, msg: RequestMessage): Promise<IncomingMessage>
+    exchange(peer: Component, msg: RequestMessage): Promise<IncomingMessage>
 
 }
 
@@ -67,7 +67,7 @@ export class RequestMessage implements Message {
     type: LinkEvents;
     payload: any;
 
-    constructor(peer: Peer, props: { type: LinkEvents, payload: any }) {
+    constructor(peer: Component, props: { type: LinkEvents, payload: any }) {
         try {
             this.sender = {
                 port: peer.port
@@ -150,7 +150,7 @@ export class UDPLink extends EventEmitter implements ClusterLink {
 
     }
 
-    exchange(peer: Peer, msg: RequestMessage): Promise<IncomingMessage> {
+    exchange(peer: Component, msg: RequestMessage): Promise<IncomingMessage> {
         let promise = new Promise<IncomingMessage>((resolve, reject) => {
             this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
                 if (reply.ref == msg.id) {
@@ -177,7 +177,7 @@ export class UDPLink extends EventEmitter implements ClusterLink {
             messageHandlerFn(new IncomingMessage(m, r)))
     }
 
-    sendMessage(peer: Peer, msg: Message) {
+    sendMessage(peer: Component, msg: Message) {
         const _msg = JSON.stringify(msg)
         this.socket.send(_msg, peer.port)
 

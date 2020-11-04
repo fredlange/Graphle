@@ -1,16 +1,16 @@
 
-export interface Peer {
+export interface Component {
     name: string,
     port: number
 }
 
-export interface IPeerRegistry {
-    getAllPeers(): Peer[]
-    getPeerByName(name): Peer
-    getPeersOfPeer(peer: Peer)
+export interface IComponentRegistry {
+    getAllComponents(): Component[]
+    getComponentByName(name): Component
+    getPeersOfComponent(component: Component)
 
-    pushOnNewPeer(peer: Peer)
-    pushMultiplePeers(peers: Peer[])
+    pushOnNewComponent(component: Component)
+    pushMultipleComponents(components: Component[])
 
-    removePeer(peer: Peer)
+    removeComponent(component: Component)
 }

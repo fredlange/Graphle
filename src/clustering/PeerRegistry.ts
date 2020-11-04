@@ -1,8 +1,8 @@
-import {IPeerRegistry, Peer} from "./cluster.registry";
+import {IComponentRegistry, Component} from "./cluster.registry";
 
-export class PeerRegistry implements IPeerRegistry {
+export class PeerRegistry implements IComponentRegistry {
 
-    private registry: Peer[] = []
+    private registry: Component[] = []
     private readonly nameOfSelf: string;
 
     constructor(nameOfSelf: string) {
@@ -10,59 +10,59 @@ export class PeerRegistry implements IPeerRegistry {
         // setInterval(() => console.log('Peers of', nameOfSelf, this), 2000)
     }
 
-    getPeerByName(name): Peer {
+    getComponentByName(name): Component {
         let peer = this.registry.filter(p => p.name == name)[0];
         if (!peer) throw 'No component with name ' + name
         return peer
     }
 
-    pushOnNewPeer(peer: Peer) {
+    pushOnNewComponent(peer: Component) {
         if (this.isKnownByName(peer)) this.updatePortOfPeer(peer)
         if (!this.isKnownByPort(peer)) this.appendPeerNotSelf(peer)
     }
 
-    pushMultiplePeers(peers: Peer[]) {
+    pushMultipleComponents(peers: Component[]) {
         for (const p of peers) this.appendPeerNotSelf(p)
     }
 
-    getAllPeers(): Peer[] {
+    getAllComponents(): Component[] {
         return this.registry
     }
 
-    getPeersOfPeer(peer: Peer) {
+    getPeersOfComponent(peer: Component) {
         return this.registry
             .filter(p => p.port != peer.port)
     }
 
 
-    removePeer(peer: Peer) {
+    removeComponent(peer: Component) {
         console.info('Removing component:', peer.name)
         this.registry.splice(this.registry.indexOf(peer), 1)
     }
 
-    pushPeer(peer: Peer) {
+    pushPeer(peer: Component) {
         console.info('Pushing new component', peer)
         this.registry.push(peer)
     }
 
-    private isKnownByName(peer: Peer): boolean {
+    private isKnownByName(peer: Component): boolean {
         return this.registry
             .filter(p => p.name == peer.name)
             .length > 0
     }
 
-    private isKnownByPort(peer: Peer): boolean {
+    private isKnownByPort(peer: Component): boolean {
         return this.registry
             .filter(p => p.port == peer.port)
             .length > 0
     }
 
-    private updatePortOfPeer(peer: Peer) {
+    private updatePortOfPeer(peer: Component) {
         console.info('Updating port of', peer.name, 'to', peer.port)
-        this.getPeerByName(peer.name).port = peer.port
+        this.getComponentByName(peer.name).port = peer.port
     }
 
-    private appendPeerNotSelf(peer: Peer) {
+    private appendPeerNotSelf(peer: Component) {
         if (peer.name != this.nameOfSelf) this.registry.push(peer)
     }
 

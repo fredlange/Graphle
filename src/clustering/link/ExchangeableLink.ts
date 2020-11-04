@@ -1,6 +1,6 @@
 import {ErrorMessage, IncomingMessage, LinkErrorReasons, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
 import PromiseController from 'promise-controller';
-import {Peer} from "../cluster.registry";
+import {Component} from "../cluster.registry";
 
 export class ExchangeableLink extends UDPLink {
 
@@ -27,7 +27,7 @@ export class ExchangeableLink extends UDPLink {
 
     }
 
-    exchange(peer: Peer, msg: RequestMessage): Promise<IncomingMessage> {
+    exchange(peer: Component, msg: RequestMessage): Promise<IncomingMessage> {
         const timeoutReasonCode = 'NO_REPLY';
 
         const pc = new PromiseController({

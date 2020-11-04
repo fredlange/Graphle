@@ -1,7 +1,7 @@
 import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./link/ClusterLink";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../cluster-orator/app";
-import {IPeerRegistry} from "./cluster.registry";
+import {IComponentRegistry} from "./cluster.registry";
 import {PeerRegistry} from "./PeerRegistry";
 
 interface ClusterManagerConfig {
@@ -24,7 +24,7 @@ export class ClusterManager extends EventEmitter {
 
     private readonly appName: string
     private readonly link: ClusterLink
-    protected readonly peers: IPeerRegistry
+    protected readonly peers: IComponentRegistry
     private readonly role: ComponentRoles
 
     constructor(config: ClusterManagerConfig) {
@@ -57,12 +57,12 @@ export class ClusterManager extends EventEmitter {
                 // Multiple peers such as initial connect
                 if (Array.isArray(msg.payload)) {
                     this.emit(ClusterEvents.STATE_REHYDRATE, msg.payload)
-                    this.peers.pushMultiplePeers(msg.payload)
+                    this.peers.pushMultipleComponents(msg.payload)
                 }
                 // Single component, on continues connection
                 else {
                     this.emit(ClusterEvents.NEW_PEER, msg.payload)
-                    this.peers.pushOnNewPeer(msg.payload)
+                    this.peers.pushOnNewComponent(msg.payload)
                 }
             }
         })
@@ -101,7 +101,7 @@ export class ClusterManager extends EventEmitter {
      */
     _exchange(name: string, payload: any): Promise<any> {
 
-        let peer = this.peers.getPeerByName(name);
+        let peer = this.peers.getComponentByName(name);
         const msg = new RequestMessage(peer, {
             type: LinkEvents.QUERY, // TODO Should probably not be hardcoded?
             payload: payload

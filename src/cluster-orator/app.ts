@@ -4,7 +4,7 @@ import {IncomingMessage} from "./IncomingMessage";
 import {RequestRegistry} from "./RequestRegistry";
 import {IOutboundMessage} from "./types";
 import {LinkEvents} from "../clustering/link/ClusterLink";
-import {IPeerRegistry, Peer} from "../clustering/cluster.registry";
+import {IComponentRegistry, Component} from "../clustering/cluster.registry";
 import {PeerRegistry} from "../clustering/PeerRegistry";
 
 /**
@@ -19,7 +19,7 @@ export enum ComponentRoles {
 export class UDPClusterManager {
 
     static server = createSocket('udp4')
-    componentRegistry: IPeerRegistry
+    componentRegistry: IComponentRegistry
         = new PeerRegistry('UDPClusterManager')
     requestRegistry = RequestRegistry
     port = 41236
@@ -32,12 +32,12 @@ export class UDPClusterManager {
         console.log('Server is up and running')
     }
 
-    sendMessage(payload, peer: Peer, type = undefined) {
+    sendMessage(payload, peer: Component, type = undefined) {
         let msg = JSON.stringify(this.makeMessage(peer, {payload, type}));
         UDPClusterManager.server.send(msg, peer.port)
     }
 
-    async exchange(payload: any, peer: Peer, type: string): Promise<any> {
+    async exchange(payload: any, peer: Component, type: string): Promise<any> {
 
         const msg = this.makeMessage(peer, {payload, type})
         UDPClusterManager.server.send(JSON.stringify(msg), peer.port)
@@ -57,11 +57,11 @@ export class UDPClusterManager {
     pingPeers() {
         setInterval(async () => {
             // console.log('Ping all peers')
-            for (const p of this.componentRegistry.getAllPeers()) {
+            for (const p of this.componentRegistry.getAllComponents()) {
                 try {
                     await this.exchange({}, p, LinkEvents.PING)
                 } catch (e) {
-                    this.componentRegistry.removePeer((e as IOutboundMessage).peer)
+                    this.componentRegistry.removeComponent((e as IOutboundMessage).peer)
                 }
 
             }
@@ -82,7 +82,7 @@ export class UDPClusterManager {
                     }
                     default: {
                         const {component, payload} = _msg
-                        let peersOfPeer = this.componentRegistry.getPeersOfPeer(component);
+                        let peersOfPeer = this.componentRegistry.getPeersOfComponent(component);
 
                         console.log('Peers of peer', peersOfPeer)
 
@@ -102,7 +102,7 @@ export class UDPClusterManager {
                         this.sendMessage(actualPeersOfPeer, component)
 
                         // Push new component intro componentRegistry
-                        this.componentRegistry.pushOnNewPeer(component)
+                        this.componentRegistry.pushOnNewComponent(component)
                     }
 
                 }
