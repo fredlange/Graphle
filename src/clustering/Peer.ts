@@ -1,13 +1,7 @@
-export interface Peer {
-
-    name: string,
-    port: number
-
-}
+import {Peer} from "./cluster.registry";
 
 
-export const PeerRegistry = class {
-
+export const PeerRegistry = class PeerRegistry {
 
     private registry: Peer[] = []
     private readonly nameOfSelf: string;
