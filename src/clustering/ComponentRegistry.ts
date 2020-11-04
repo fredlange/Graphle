@@ -1,13 +1,13 @@
 import {IComponentRegistry, Component} from "./cluster.registry";
 
-export class PeerRegistry implements IComponentRegistry {
+export class ComponentRegistry implements IComponentRegistry {
 
     private registry: Component[] = []
     private readonly nameOfSelf: string;
 
     constructor(nameOfSelf: string) {
         this.nameOfSelf = nameOfSelf;
-        // setInterval(() => console.log('Peers of', nameOfSelf, this), 2000)
+        setInterval(() => console.log('Peers of', nameOfSelf, this.registry.map(p => p.name)), 2000)
     }
 
     getComponentByName(name): Component {
@@ -38,11 +38,6 @@ export class PeerRegistry implements IComponentRegistry {
     removeComponent(peer: Component) {
         console.info('Removing component:', peer.name)
         this.registry.splice(this.registry.indexOf(peer), 1)
-    }
-
-    pushPeer(peer: Component) {
-        console.info('Pushing new component', peer)
-        this.registry.push(peer)
     }
 
     private isKnownByName(peer: Component): boolean {

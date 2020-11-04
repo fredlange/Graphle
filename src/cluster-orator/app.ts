@@ -5,7 +5,7 @@ import {RequestRegistry} from "./RequestRegistry";
 import {IOutboundMessage} from "./types";
 import {LinkEvents} from "../clustering/link/ClusterLink";
 import {IComponentRegistry, Component} from "../clustering/cluster.registry";
-import {PeerRegistry} from "../clustering/PeerRegistry";
+import {ComponentRegistry} from "../clustering/ComponentRegistry";
 
 /**
  * APP ONE
@@ -20,7 +20,7 @@ export class UDPClusterManager {
 
     static server = createSocket('udp4')
     componentRegistry: IComponentRegistry
-        = new PeerRegistry('UDPClusterManager')
+        = new ComponentRegistry('UDPClusterManager')
     requestRegistry = RequestRegistry
     port = 41236
 

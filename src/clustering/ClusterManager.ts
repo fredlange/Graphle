@@ -2,7 +2,7 @@ import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessag
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../cluster-orator/app";
 import {IComponentRegistry} from "./cluster.registry";
-import {PeerRegistry} from "./PeerRegistry";
+import {ComponentRegistry} from "./ComponentRegistry";
 
 interface ClusterManagerConfig {
     appName: string
@@ -30,7 +30,7 @@ export class ClusterManager extends EventEmitter {
     constructor(config: ClusterManagerConfig) {
         super()
         this.appName = config.appName
-        this.peers = new PeerRegistry(config.appName)
+        this.peers = new ComponentRegistry(config.appName)
         this.link = config.link
         this.role = config.role
 
