@@ -6,11 +6,11 @@ import {Component} from "../cluster.registry";
 export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)
 
-    sendMessage(peer: Component, msg: Message)
+    sendMessage(port: number, msg: Message)
 
     sendToServer(msg: string)
 
-    exchange(peer: Component, msg: RequestMessage): Promise<IncomingMessage>
+    exchange(port: number, msg: RequestMessage): Promise<IncomingMessage>
 
 }
 
@@ -150,7 +150,7 @@ export class UDPLink extends EventEmitter implements ClusterLink {
 
     }
 
-    exchange(peer: Component, msg: RequestMessage): Promise<IncomingMessage> {
+    exchange(port: number, msg: RequestMessage): Promise<IncomingMessage> {
         let promise = new Promise<IncomingMessage>((resolve, reject) => {
             this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
                 if (reply.ref == msg.id) {
@@ -159,7 +159,7 @@ export class UDPLink extends EventEmitter implements ClusterLink {
             })
         });
 
-        this.sendMessage(peer, msg)
+        this.sendMessage(port, msg)
         return promise
 
     }
@@ -177,9 +177,9 @@ export class UDPLink extends EventEmitter implements ClusterLink {
             messageHandlerFn(new IncomingMessage(m, r)))
     }
 
-    sendMessage(peer: Component, msg: Message) {
+    sendMessage(port: number, msg: Message) {
         const _msg = JSON.stringify(msg)
-        this.socket.send(_msg, peer.port)
+        this.socket.send(_msg, port)
 
     }
 
