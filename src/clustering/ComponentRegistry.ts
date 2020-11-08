@@ -16,13 +16,13 @@ export class ComponentRegistry implements IComponentRegistry {
         return peer
     }
 
-    pushOnNewComponent(peer: Component) {
-        if (this.isKnownByName(peer)) this.updatePortOfPeer(peer)
-        if (!this.isKnownByPort(peer)) this.appendPeerNotSelf(peer)
+    pushOnNewComponent(component: Component) {
+        if (this.isKnownByName(component)) this.updatePortOfPeer(component)
+        if (!this.isKnownByPort(component)) this.appendPeerNotSelf(component)
     }
 
-    pushMultipleComponents(peers: Component[]) {
-        for (const p of peers) this.appendPeerNotSelf(p)
+    pushMultipleComponents(components: Component[]) {
+        for (const p of components) this.appendPeerNotSelf(p)
     }
 
     getAllComponents(): Component[] {

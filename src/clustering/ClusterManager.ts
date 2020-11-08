@@ -2,12 +2,12 @@ import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessag
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../cluster-orator/app";
 import {IComponentRegistry} from "./cluster.registry";
-import {ComponentRegistry} from "./ComponentRegistry";
 
 interface ClusterManagerConfig {
     appName: string
     link: ClusterLink,
-    role: ComponentRoles
+    role: ComponentRoles,
+    componentRegistry: IComponentRegistry
 }
 
 /*
@@ -24,13 +24,13 @@ export class ClusterManager extends EventEmitter {
 
     private readonly appName: string
     private readonly link: ClusterLink
-    protected readonly peers: IComponentRegistry
+    protected peers: IComponentRegistry
     private readonly role: ComponentRoles
 
     constructor(config: ClusterManagerConfig) {
         super()
         this.appName = config.appName
-        this.peers = new ComponentRegistry(config.appName)
+        this.peers = config.componentRegistry
         this.link = config.link
         this.role = config.role
 
@@ -62,27 +62,19 @@ export class ClusterManager extends EventEmitter {
                 // Single component, on continues connection
                 else {
                     this.emit(ClusterEvents.NEW_PEER, msg.payload)
-                    this.peers.pushOnNewComponent(msg.payload)
+                    this.peers.pushOnNewComponent({
+                        port: msg.sender.port,
+                        name: msg.payload.appName,
+                        schema: msg.payload.schemaSource
+                    })
                 }
             }
         })
     }
 
     respondOnQuery(fn: (msg: IncomingMessage) => Promise<ResponseMessage>) {
-
-        this.link.on(LinkEvents.QUERY, (msg: IncomingMessage) => {
-
-            fn(msg)
-                .then(p => {
-                    this.link.sendMessage({
-                        port: msg.sender.port,
-                        name: 'reg' // TODO Useless...
-                    }, p)
-                })
-
-
-        })
-
+        this.link.on(LinkEvents.QUERY, (msg: IncomingMessage) =>
+            fn(msg).then(p => this.link.sendMessage(msg.sender.port, p)))
     }
 
     connectToCluster(payload: any) {
@@ -99,15 +91,22 @@ export class ClusterManager extends EventEmitter {
     /*
     Temporary exposure of exchange. Should not actually be used
      */
-    _exchange(name: string, payload: any): Promise<any> {
+    _exchange(name: string, payload: any, type: LinkEvents = LinkEvents.QUERY): Promise<any> {
 
         let peer = this.peers.getComponentByName(name);
         const msg = new RequestMessage(peer, {
-            type: LinkEvents.QUERY, // TODO Should probably not be hardcoded?
+            type: type,
             payload: payload
         })
 
-        return this.link.exchange(peer, msg)
+        return this.link.exchange(peer.port, msg)
+    }
+
+    /*
+    Temporary exposure of sendMessage. Should not be used later on me thinks...
+     */
+    _send(port: number, message: any) {
+        this.link.sendMessage(port, message)
     }
 
 }
