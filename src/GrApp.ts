@@ -5,6 +5,7 @@ import {buildSchema, graphql, GraphQLSchema} from "graphql";
 import {createSubschema, stitch} from "./graphql/schema";
 import {graphqlHTTP} from "express-graphql";
 import {ExchangeableLink} from "./clustering/link/ExchangeableLink";
+import {ComponentRegistry} from "./clustering/ComponentRegistry";
 
 export namespace GrApp {
 
@@ -37,10 +38,14 @@ export namespace GrApp {
             this.clusterManager = new ClusterManager({
                 appName: opt.name,
                 link: new ExchangeableLink({serverPort: 41236}),
-                role: opt.role
+                role: opt.role,
+                componentRegistry: new ComponentRegistry(opt.name)
             });
 
-            this.clusterManager.connectToCluster({schemaSource: opt.source})
+            this.clusterManager.connectToCluster({
+                appName: opt.name,
+                schemaSource: opt.source
+            })
 
             this.clusterManager.on(ClusterEvents.STATE_REHYDRATE, (payload: StateRehydratePayload[]) => {
                 console.log('PEER REHYDRATES STATE', payload);
