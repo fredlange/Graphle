@@ -1,13 +1,14 @@
 
 export interface Component {
     name: string,
-    port: number
+    port: number,
+    schema: string
 }
 
 export interface IComponentRegistry {
     getAllComponents(): Component[]
     getComponentByName(name): Component
-    getPeersOfComponent(component: Component)
+    getPeersOfComponent(component: Component): Component[]
 
     pushOnNewComponent(component: Component)
     pushMultipleComponents(components: Component[])
