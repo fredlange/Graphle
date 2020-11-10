@@ -16,6 +16,7 @@ export interface ClusterLink extends EventEmitter {
 
 export interface StateRehydratePayload {
     name: string
+    port: number,
     state: {
         schemaSource: string
     }
