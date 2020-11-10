@@ -1,7 +1,7 @@
 import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./link/ClusterLink";
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../cluster-orator/app";
-import {IComponentRegistry} from "./cluster.registry";
+import {Component, IComponentRegistry} from "./cluster.registry";
 
 interface ClusterManagerConfig {
     appName: string
@@ -14,10 +14,32 @@ interface ClusterManagerConfig {
 Events emitted by the ClusterManager EventEmitter
  */
 export enum ClusterEvents {
-    NOTIFY_MANAGER = "NOTIFY_MANAGER",
-    MESSAGE_FROM_SERVER = "MESSAGE_FROM_SERVER",
-    NEW_PEER = 'NEW_PEER',
-    STATE_REHYDRATE = "STATE_REHYDRATE"
+
+    /*
+    Emitted when a new component is pushed into registry successfully
+     */
+    NEW_COMPONENT = 'NEW_COMPONENT',
+
+    /*
+    Emitted when a new component sends itself to the orator
+     */
+    CONNECT_AS_NEW_COMPONENT = 'CONNECT_AS_NEW_COMPONENT',
+
+    /*
+    Emitted when a state rehydration occurs which should
+    wipe all state and use the latest state from the payload
+     */
+    STATE_REHYDRATE = "STATE_REHYDRATE",
+
+    /*
+    Emitted when the cluster  state is rehydrated successfully
+     */
+    STATE_REHYDRATED = "STATE_REHYDRATED",
+
+    /*
+    Emitted when a new component needs to be pushed into the registry
+     */
+    NEW_COMPONENT_IN_CLUSTER = "NEW_COMPONENT_IN_CLUSTER",
 }
 
 export class ClusterManager extends EventEmitter {
@@ -48,27 +70,31 @@ export class ClusterManager extends EventEmitter {
 
         })
 
-        this.link.onMessage(msg => {
-            if (!msg.isTyped()) {
+        // Re emit the message as a event from the message type
+        this.link.onMessage((msg => this.emit(msg.type, msg)))
 
-                console.log('Message', msg)
 
-                // Untyped only on message from server!
-                // Multiple peers such as initial connect
-                if (Array.isArray(msg.payload)) {
-                    this.emit(ClusterEvents.STATE_REHYDRATE, msg.payload)
-                    this.peers.pushMultipleComponents(msg.payload)
-                }
-                // Single component, on continues connection
-                else {
-                    this.emit(ClusterEvents.NEW_PEER, msg.payload)
-                    this.peers.pushOnNewComponent({
-                        port: msg.sender.port,
-                        name: msg.payload.appName,
-                        schema: msg.payload.schemaSource
-                    })
-                }
-            }
+        this.on(ClusterEvents.NEW_COMPONENT_IN_CLUSTER, msg => {
+            this.peers.pushOnNewComponent(msg.payload)
+
+            this.emit(ClusterEvents.NEW_COMPONENT, {
+                schemaSource: msg.payload.schema,
+                name: msg.payload.name,
+            })
+        })
+
+        this.on(ClusterEvents.STATE_REHYDRATE, payload => {
+            console.log('Rehydrating state', payload.payload)
+            const comps = payload.payload.map(p => ({
+                name: p.name,
+                port: p.port,
+                schema: p.state.schemaSource
+            } as Component))
+
+            this.peers.pushMultipleComponents(comps)
+
+            this.emit(ClusterEvents.STATE_REHYDRATED, this.peers)
+
         })
     }
 
@@ -79,11 +105,14 @@ export class ClusterManager extends EventEmitter {
 
     connectToCluster(payload: any) {
         this.link.sendToServer(JSON.stringify({
-            component: {
-                name: this.appName,
-                role: this.role
-            },
-            payload: payload
+            type: ClusterEvents.CONNECT_AS_NEW_COMPONENT,
+            payload: {
+                component: {
+                    name: this.appName,
+                    role: this.role
+                },
+                ...payload
+            }
         }))
     }
 

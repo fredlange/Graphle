@@ -6,6 +6,7 @@ import {createSubschema, stitch} from "./graphql/schema";
 import {graphqlHTTP} from "express-graphql";
 import {ExchangeableLink} from "./clustering/link/ExchangeableLink";
 import {ComponentRegistry} from "./clustering/ComponentRegistry";
+import {IComponentRegistry} from "./clustering/cluster.registry";
 
 export namespace GrApp {
 
@@ -47,17 +48,23 @@ export namespace GrApp {
                 schemaSource: opt.source
             })
 
-            this.clusterManager.on(ClusterEvents.STATE_REHYDRATE, (payload: StateRehydratePayload[]) => {
-                console.log('PEER REHYDRATES STATE', payload);
-                payload.forEach(p => {
-                    this._schema = stitch(this._schema, createSubschema(p.state.schemaSource, p.name, this.clusterManager));
+            /*
+            when the state is rehydrated, restitch the schema
+             */
+            this.clusterManager.on(ClusterEvents.STATE_REHYDRATED, (payload: IComponentRegistry) => {
+                console.log('State rehydrated. Restitching schema', payload);
+                payload.getAllComponents().forEach(p => {
+                    this._schema = stitch(this._schema, createSubschema(p.schema, p.name, this.clusterManager));
                     console.log('NEW SCHEMA SET');
                 })
             })
-            this.clusterManager.on(ClusterEvents.NEW_PEER, (event) => {
-                console.log('SPECTATOR NOTICED A NEW COMPONENT');
-                console.log('EVENT', event)
-                this._schema = stitch(this._schema, createSubschema(event.schemaSource, event.name, this.clusterManager));
+
+            /*
+            When a new component is registered, stitch the schema to local schema
+             */
+            this.clusterManager.on(ClusterEvents.NEW_COMPONENT, (newComponent) => {
+                console.log(this.options.name, 'noticed a new component:', newComponent.name);
+                this._schema = stitch(this._schema, createSubschema(newComponent.schemaSource, newComponent.name, this.clusterManager));
                 console.log('NEW SCHEMA SET');
             });
 
