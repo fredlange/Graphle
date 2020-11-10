@@ -7,7 +7,7 @@ export class ComponentRegistry implements IComponentRegistry {
 
     constructor(nameOfSelf: string) {
         this.nameOfSelf = nameOfSelf;
-        setInterval(() => console.log('Peers of', nameOfSelf, this.registry.map(p => p.name)), 2000)
+        setInterval(() => console.log('Neighbouring components of', nameOfSelf, this.registry.map(p => p.name)), 2000)
     }
 
     getComponentByName(name): Component {
