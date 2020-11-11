@@ -43,6 +43,7 @@ export class ExchangeableLink extends UDPLink {
                         code: LinkErrorReasons.TIMEOUT,
                         msg: msg
                     } as ErrorMessage)
+                    throw new RequestTimeoutError(msg.id)
                 } else {
                     throw e
                 }
@@ -54,4 +55,11 @@ export class ExchangeableLink extends UDPLink {
         return this.inflightRequests.hasOwnProperty(id)
     }
 
+}
+
+export class RequestTimeoutError extends Error {
+    constructor(id: string) {
+        super(`RequestTimeout ${id}`);
+        this.name = 'RequestTimeoutError'
+    }
 }
