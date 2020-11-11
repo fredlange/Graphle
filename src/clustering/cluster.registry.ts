@@ -14,4 +14,6 @@ export interface IComponentRegistry {
     pushMultipleComponents(components: Component[])
 
     removeComponent(component: Component)
+
+    rehydrateRegistry(components: Component[])
 }

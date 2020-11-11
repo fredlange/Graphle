@@ -2,6 +2,7 @@ import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessag
 import {EventEmitter} from "events";
 import {ComponentRoles} from "../cluster-orator/app";
 import {Component, IComponentRegistry} from "./cluster.registry";
+import {RequestTimeoutError} from "./link/ExchangeableLink";
 
 interface ClusterManagerConfig {
     appName: string
@@ -40,6 +41,11 @@ export enum ClusterEvents {
     Emitted when a new component needs to be pushed into the registry
      */
     NEW_COMPONENT_IN_CLUSTER = "NEW_COMPONENT_IN_CLUSTER",
+
+    /*
+    Emitted when a component is unresponsive and should be removed from registry
+     */
+    UNRESPONSIVE_COMPONENT = 'UNRESPONSIVE_COMPONENT'
 }
 
 export class ClusterManager extends EventEmitter {
@@ -57,9 +63,11 @@ export class ClusterManager extends EventEmitter {
         this.role = config.role
 
         this.link.on(LinkEvents.PING, (incMsg: IncomingMessage) => {
+
+            console.log('Ping', incMsg)
             this.link.sendToServer(JSON.stringify({
                 id: incMsg.ref,
-                type: 'RESPONSE',
+                type: LinkEvents.REPLY,
                 component: {
                     name: this.appName
                 },
@@ -91,7 +99,7 @@ export class ClusterManager extends EventEmitter {
                 schema: p.state.schemaSource
             } as Component))
 
-            this.peers.pushMultipleComponents(comps)
+            this.peers.rehydrateRegistry(comps)
 
             this.emit(ClusterEvents.STATE_REHYDRATED, this.peers)
 
@@ -129,6 +137,16 @@ export class ClusterManager extends EventEmitter {
         })
 
         return this.link.exchange(peer.port, msg)
+            /*
+            This is a low tolerance solution for removing components
+            when they do not respond. This should be changed into something
+            that will retry X times before removing a component, or change the
+            solution in full
+             */
+            .catch(e => {
+                if (e instanceof RequestTimeoutError)
+                    this.emit(ClusterEvents.UNRESPONSIVE_COMPONENT, {name: name})
+            })
     }
 
     /*

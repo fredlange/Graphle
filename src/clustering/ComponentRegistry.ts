@@ -16,13 +16,18 @@ export class ComponentRegistry implements IComponentRegistry {
         return peer
     }
 
+    rehydrateRegistry(components: Component[]) {
+        this.registry = []
+        this.pushMultipleComponents(components)
+    }
+
     pushOnNewComponent(component: Component) {
         if (this.isKnownByName(component)) this.updatePortOfPeer(component)
         if (!this.isKnownByPort(component)) this.appendPeerNotSelf(component)
     }
 
     pushMultipleComponents(components: Component[]) {
-        for (const p of components) this.appendPeerNotSelf(p)
+        for (const p of components) this.pushOnNewComponent(p)
     }
 
     getAllComponents(): Component[] {

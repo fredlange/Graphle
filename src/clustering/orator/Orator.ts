@@ -60,6 +60,28 @@ export class Orator extends ClusterManager {
         })
 
 
+        this.on(ClusterEvents.UNRESPONSIVE_COMPONENT, name => {
+            console.log('Unresponsive component', name)
+            this.peers.removeComponent(
+                this.peers.getComponentByName(name.name)
+            )
+            this.peers.getAllComponents()
+                .forEach(c => {
+                    this._send(c.port, {
+                        type: ClusterEvents.STATE_REHYDRATE,
+                        payload: this.peers.getPeersOfComponent(c)
+                            .map(p => ({
+                                name: p.name,
+                                port: p.port,
+                                state: {
+                                    schemaSource: p.schema
+                                }
+                            } as StateRehydratePayload))
+                    })
+                })
+        })
+
+
     }
 
     // TODO PING does not seem to work. No error is thrown. No timeout
@@ -67,8 +89,7 @@ export class Orator extends ClusterManager {
         this.peers
             .getAllComponents()
             .forEach(p => this._exchange(p.name, {}, LinkEvents.PING)
-                .then(r => console.log(p.name, 'responded with ', r))
-                .catch(e => console.log('Need to remove peer', e)))
+                .then(r => console.log(p.name, 'responded with ', r)))
     }
 
 }
