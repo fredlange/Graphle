@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:manager": "ts-node ./src/demo/manager.ts",
     "start:orator": "ts-node ./src/demo/orator.ts",
     "start:spectator:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/spectator.ts",
     "start:app1:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/app.ts",

@@ -1,8 +1,12 @@
 import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessage} from "./link/ClusterLink";
 import {EventEmitter} from "events";
-import {ComponentRoles} from "../cluster-orator/app";
 import {Component, IComponentRegistry} from "./cluster.registry";
 import {RequestTimeoutError} from "./link/ExchangeableLink";
+
+export enum ComponentRoles {
+    PEER = 'peer',
+    SPECTATOR = 'spectator'
+}
 
 interface ClusterManagerConfig {
     appName: string

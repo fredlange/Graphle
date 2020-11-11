@@ -1,6 +1,5 @@
-import {ClusterEvents, ClusterManager} from "./clustering/ClusterManager";
-import {ResponseMessage, StateRehydratePayload} from "./clustering/link/ClusterLink";
-import {ComponentRoles} from "./cluster-orator/app";
+import {ClusterEvents, ClusterManager, ComponentRoles} from "./clustering/ClusterManager";
+import {ResponseMessage} from "./clustering/link/ClusterLink";
 import {buildSchema, graphql, GraphQLSchema} from "graphql";
 import {createSubschema, stitch} from "./graphql/schema";
 import {graphqlHTTP} from "express-graphql";

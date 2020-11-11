@@ -1,5 +1,4 @@
-import {ClusterEvents, ClusterManager} from "../ClusterManager";
-import {ComponentRoles} from "../../cluster-orator/app";
+import {ClusterEvents, ClusterManager, ComponentRoles} from "../ClusterManager";
 import {ExchangeableLink} from "../link/ExchangeableLink";
 import {ComponentRegistry} from "../ComponentRegistry";
 import {IncomingMessage, LinkEvents, StateRehydratePayload} from "../link/ClusterLink";
