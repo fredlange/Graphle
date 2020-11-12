@@ -1,5 +1,6 @@
 import {ErrorMessage, IncomingMessage, LinkErrorReasons, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
 import PromiseController from 'promise-controller';
+import {VerboseLogging} from "../../logging/verbose.logger";
 
 export class ExchangeableLink extends UDPLink {
 
@@ -19,7 +20,7 @@ export class ExchangeableLink extends UDPLink {
                     req.resolve(reply.payload)
                 }
             } catch (e) {
-                console.log('Error during Reply handling', e)
+                VerboseLogging.error('Error during Reply handling', e)
                 req.reject(e)
             }
         })
@@ -51,7 +52,6 @@ export class ExchangeableLink extends UDPLink {
     }
 
     _isInFlight(id): boolean {
-        console.log('In flight', this.inflightRequests)
         return this.inflightRequests.hasOwnProperty(id)
     }
 

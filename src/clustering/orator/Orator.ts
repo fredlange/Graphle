@@ -2,6 +2,7 @@ import {ClusterEvents, ClusterManager, ComponentRoles} from "../ClusterManager";
 import {ExchangeableLink} from "../link/ExchangeableLink";
 import {ComponentRegistry} from "../ComponentRegistry";
 import {IncomingMessage, LinkEvents, StateRehydratePayload} from "../link/ClusterLink";
+import {VerboseLogging} from "../../logging/verbose.logger";
 
 
 export class Orator extends ClusterManager {
@@ -21,7 +22,7 @@ export class Orator extends ClusterManager {
         setInterval(() => this.pingPeers(), 5000)
 
         this.on(ClusterEvents.CONNECT_AS_NEW_COMPONENT, (msg: IncomingMessage) => {
-            console.log('New component notification', msg.payload)
+            VerboseLogging.info('New component notification', msg.payload)
             const comp = {
                 port: msg.sender.port,
                 schema: msg.payload.schemaSource,
@@ -60,7 +61,7 @@ export class Orator extends ClusterManager {
 
 
         this.on(ClusterEvents.UNRESPONSIVE_COMPONENT, name => {
-            console.log('Unresponsive component', name)
+            VerboseLogging.info('Unresponsive component', name)
             this.peers.removeComponent(
                 this.peers.getComponentByName(name.name)
             )
@@ -88,7 +89,7 @@ export class Orator extends ClusterManager {
         this.peers
             .getAllComponents()
             .forEach(p => this._exchange(p.name, {}, LinkEvents.PING)
-                .then(r => console.log(p.name, 'responded with ', r)))
+                .then(r => VerboseLogging.info('responded with ', r)))
     }
 
 }

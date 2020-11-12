@@ -1,4 +1,5 @@
-import {IComponentRegistry, Component} from "./cluster.registry";
+import {Component, IComponentRegistry} from "./cluster.registry";
+import {VerboseLogging} from "../logging/verbose.logger";
 
 export class ComponentRegistry implements IComponentRegistry {
 
@@ -7,7 +8,7 @@ export class ComponentRegistry implements IComponentRegistry {
 
     constructor(nameOfSelf: string) {
         this.nameOfSelf = nameOfSelf;
-        setInterval(() => console.log('Neighbouring components of', nameOfSelf, this.registry.map(p => p.name)), 2000)
+        setInterval(() => VerboseLogging.debug('Neighbouring components of', nameOfSelf, this.registry.map(p => p.name)), 2000)
     }
 
     getComponentByName(name): Component {
@@ -65,10 +66,6 @@ export class ComponentRegistry implements IComponentRegistry {
     private appendPeerNotSelf(peer: Component) {
         if (peer.name != this.nameOfSelf) this.registry.push(peer)
     }
-
-
-
-
 
 
 }

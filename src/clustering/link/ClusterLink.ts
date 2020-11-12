@@ -2,6 +2,7 @@ import {createSocket, RemoteInfo, Socket} from "dgram";
 import {EventEmitter} from "events";
 import {getRandomInt} from "../DummyUtils";
 import {Component} from "../cluster.registry";
+import {VerboseLogging} from "../../logging/verbose.logger";
 
 export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)
@@ -140,10 +141,10 @@ export class UDPLink extends EventEmitter implements ClusterLink {
         this.serverPort = opt.serverPort
         this.socket = createSocket('udp4')
         this.socket
-            .on('connect', () => console.log('Connected'))
+            .on('connect', () => VerboseLogging.debug('Connected'))
             .on('listening', () => {
                 const address = this.socket.address();
-                console.log(`Peer listening ${address.address}:${address.port}`);
+                VerboseLogging.info(`Component listening ${address.address}:${address.port}`);
             })
             .bind(opt.linkPort)
 

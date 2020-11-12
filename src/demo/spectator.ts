@@ -1,5 +1,6 @@
 import express from 'express';
 import {GrApp} from "../GrApp";
+import {VerboseLogging} from "../logging/verbose.logger";
 
 
 // Construct a schema, using GraphQL schema language
@@ -22,6 +23,6 @@ const spectator = new GrApp.Spectator({
 
 const expr = express();
 expr.listen(4000, () => {
-    console.log('Running a GraphQL API server at http://localhost:4000/graphql');
     expr.use('/graphql', spectator.makeHttpMiddleware());
+    VerboseLogging.info('Running a GraphQL API server at http://localhost:4000/graphql')
 });

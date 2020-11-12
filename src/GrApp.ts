@@ -6,6 +6,7 @@ import {graphqlHTTP} from "express-graphql";
 import {ExchangeableLink} from "./clustering/link/ExchangeableLink";
 import {ComponentRegistry} from "./clustering/ComponentRegistry";
 import {IComponentRegistry} from "./clustering/cluster.registry";
+import {VerboseLogging} from "./logging/verbose.logger";
 
 export namespace GrApp {
 
@@ -33,6 +34,10 @@ export namespace GrApp {
         protected constructor(opt: ComponentOptions) {
             this.options = opt
 
+            VerboseLogging.configure({
+                name: opt.name
+            })
+
             this._schema = buildSchema(opt.source);
             this._rootResolver = opt.rootResolver
             this.clusterManager = new ClusterManager({
@@ -51,10 +56,10 @@ export namespace GrApp {
             when the state is rehydrated, restitch the schema
              */
             this.clusterManager.on(ClusterEvents.STATE_REHYDRATED, (payload: IComponentRegistry) => {
-                console.log('State rehydrated. Restitching schema', payload);
+                VerboseLogging.info('State rehydrated. Restitching schema', payload)
                 payload.getAllComponents().forEach(p => {
                     this._schema = stitch(this._schema, createSubschema(p.schema, p.name, this.clusterManager));
-                    console.log('NEW SCHEMA SET');
+                    VerboseLogging.info('New schema is set')
                 })
             })
 
@@ -62,25 +67,23 @@ export namespace GrApp {
             When a new component is registered, stitch the schema to local schema
              */
             this.clusterManager.on(ClusterEvents.NEW_COMPONENT, (newComponent) => {
-                console.log(this.options.name, 'noticed a new component:', newComponent.name);
+                VerboseLogging.info('noticed a new component:', newComponent.name)
                 this._schema = stitch(this._schema, createSubschema(newComponent.schemaSource, newComponent.name, this.clusterManager));
-                console.log('NEW SCHEMA SET');
+                VerboseLogging.info('New schema is set')
             });
 
 
             this.clusterManager.respondOnQuery(async msg => {
-
-
-                console.log('ON QUERY MSG', msg)
+                VerboseLogging.debug('On Query Message:', msg)
                 const res = await graphql(this._schema, msg.payload.query, this._rootResolver, {}, msg.payload.variables)
-                console.log('GQL RES', res)
+                VerboseLogging.debug('GQL Response:', res)
                 return new ResponseMessage(msg.ref, res)
             })
         }
 
         protected async query(query: string, variables: any = {}): Promise<any> {
             let executionResult = await graphql(this._schema, query, this._rootResolver, {}, variables);
-            console.log('ex res', executionResult)
+            VerboseLogging.debug('Execution result:', executionResult)
             return executionResult
         }
 

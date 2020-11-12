@@ -2,6 +2,7 @@ import {ClusterLink, IncomingMessage, LinkEvents, RequestMessage, ResponseMessag
 import {EventEmitter} from "events";
 import {Component, IComponentRegistry} from "./cluster.registry";
 import {RequestTimeoutError} from "./link/ExchangeableLink";
+import {VerboseLogging} from "../logging/verbose.logger";
 
 export enum ComponentRoles {
     PEER = 'peer',
@@ -67,8 +68,7 @@ export class ClusterManager extends EventEmitter {
         this.role = config.role
 
         this.link.on(LinkEvents.PING, (incMsg: IncomingMessage) => {
-
-            console.log('Ping', incMsg)
+            VerboseLogging.debug('Ping received, responding...')
             this.link.sendToServer(JSON.stringify({
                 id: incMsg.ref,
                 type: LinkEvents.REPLY,
@@ -96,7 +96,7 @@ export class ClusterManager extends EventEmitter {
         })
 
         this.on(ClusterEvents.STATE_REHYDRATE, payload => {
-            console.log('Rehydrating state', payload.payload)
+            VerboseLogging.info('Rehydrating state', payload.payload)
             const comps = payload.payload.map(p => ({
                 name: p.name,
                 port: p.port,

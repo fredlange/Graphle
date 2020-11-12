@@ -28,5 +28,4 @@ The spectator provided sets up a graphiql instance to be able to use http to que
 * Orator does not emit even whenever a clients crashes
 * Orator only persist state in memory (needs something more)
 * Introspection query fills upp the UDP buffer
-* Static verbose logging
 * Query caching
