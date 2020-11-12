@@ -1,7 +1,11 @@
 # GrApp -  Microservices as a graph
 
 The idea behind GrApp is to use a dynamic graphql schema as the sole dependency for microservice communication.
-Every service is considered a "component" of the graph, extending and building the graph. Components contributing to the schema is known as a peer. Components who only reads the schema is known as a spectator.
+Every service is a "component" of the cluster.
+Components contributing to the schema is a peer. Peers build and resolve data to the schema.
+Components who only reads the schema is a spectator. Spectators can change the schema but should not do so.
+They should rather listen for schema changes do things. One example is exposing the schema by http (se demo spectator)
+Both peers and spectators are prototypes. Their purpose may change greatly.
 
 ## Current state
 The current state of GrApp is a POC to showcase potential of dynamic schema and custom UDP links rather than http. There are many many bugs and weird design choices!
@@ -21,6 +25,8 @@ App and app2 are the most simplistic apps to showcase how GrApp is used by an en
 The spectator provided sets up a graphiql instance to be able to use http to query against the flexible schema. The subschemas of the spectator will use UDP.
 
 ## Known bugs / Todo
-* Manager does not emot even whenever a clients crashes
-* Manager only persist state in memory (needs something more)
+* Orator does not emit even whenever a clients crashes
+* Orator only persist state in memory (needs something more)
 * Introspection query fills upp the UDP buffer
+* Static verbose logging
+* Query caching
