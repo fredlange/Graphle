@@ -3,16 +3,12 @@ import {EventEmitter} from "events";
 import {Component, IComponentRegistry} from "./cluster.registry";
 import {RequestTimeoutError} from "./link/ExchangeableLink";
 import {VerboseLogging} from "../logging/verbose.logger";
-
-export enum ComponentRoles {
-    PEER = 'peer',
-    SPECTATOR = 'spectator'
-}
+import {Graphlet} from "../Graphlet";
 
 interface ClusterManagerConfig {
     appName: string
     link: ClusterLink,
-    role: ComponentRoles,
+    role: Graphlet.Role,
     componentRegistry: IComponentRegistry
 }
 
@@ -58,7 +54,7 @@ export class ClusterManager extends EventEmitter {
     private readonly appName: string
     private readonly link: ClusterLink
     protected peers: IComponentRegistry
-    private readonly role: ComponentRoles
+    private readonly role: Graphlet.Role
 
     constructor(config: ClusterManagerConfig) {
         super()

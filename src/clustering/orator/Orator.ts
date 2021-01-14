@@ -1,8 +1,9 @@
-import {ClusterEvents, ClusterManager, ComponentRoles} from "../ClusterManager";
+import {ClusterEvents, ClusterManager} from "../ClusterManager";
 import {ExchangeableLink} from "../link/ExchangeableLink";
 import {ComponentRegistry} from "../ComponentRegistry";
 import {IncomingMessage, LinkEvents, StateRehydratePayload} from "../link/ClusterLink";
 import {VerboseLogging} from "../../logging/verbose.logger";
+import {Graphlet} from "../../Graphlet";
 
 
 export class Orator extends ClusterManager {
@@ -10,7 +11,7 @@ export class Orator extends ClusterManager {
     constructor() {
 
         super({
-            role: ComponentRoles.PEER,
+            role: Graphlet.Role.MANAGER,
             appName: 'Orator',
             link: new ExchangeableLink({
                 serverPort: 1234,

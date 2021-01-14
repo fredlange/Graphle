@@ -1,4 +1,4 @@
-import {GrApp} from "../GrApp";
+import {Graphlet} from "../Graphlet";
 
 let source = `
 type Query {
@@ -19,7 +19,7 @@ const root = {
 
     }
 };
-const app = new GrApp.Peer({
+const app = Graphlet.joinAsPeer({
     name: 'theFirstApp',
     source: source,
     rootResolver: root

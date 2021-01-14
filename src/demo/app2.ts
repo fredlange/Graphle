@@ -1,7 +1,4 @@
-
-
-// Construct a schema, using GraphQL schema language
-import {GrApp} from "../GrApp";
+import {Graphlet} from "../Graphlet";
 
 let source = `
 type Query {
@@ -23,10 +20,9 @@ const root = {
     }
 };
 
-const app = new GrApp.Peer(
-    {
+const app = Graphlet
+    .joinAsPeer({
         name: 'pooperApp',
         rootResolver: root,
         source: source
-    }
-)
+    })
