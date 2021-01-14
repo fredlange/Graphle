@@ -1,8 +1,8 @@
 {
   "name": "@graphle/graphlet",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
-  "main": "GrApp.js",
+  "main": "Graphlet.js",
   "scripts": {
     "start:orator": "ts-node ./src/demo/orator.ts",
     "start:spectator:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/spectator.ts",
