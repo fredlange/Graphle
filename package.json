@@ -1,6 +1,6 @@
 {
   "name": "@graphle/graphlet",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "GrApp.js",
   "scripts": {
