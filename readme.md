@@ -8,7 +8,65 @@ Facades are used to expose the schema to the outside world, for instance by Http
 
 ## Getting started
 `npm install @graphle/graphlet`
-Graphle Demo repo will be the main repo to showcase how Graphle can be used to build your application.
+
+You always need an orator in your project
+```javascript
+import {Orator} from "@graphle/graphlet/orator/Orator";
+const orator = new Orator()
+```
+Then you add graphlets using:
+```javascript
+import {Graphlet} from "@graphle/graphlet";
+export const app = Graphlet.joinAsPeer({
+    name: 'my-graphlet',
+    source: `type Query {
+        example: String
+    }`,
+    rootResolver: {
+        example: () => 'Example'
+    }      
+})
+```
+This will create a schema containing example, as well as the resolver function for example.
+In some other graphlet you can query:
+
+
+```javascript
+import {Graphlet} from "@graphle/graphlet";
+export const app = Graphlet.joinAsPeer({
+    name: 'my-other-graphlet',
+    source: `type Query {
+        queryGraphlet: String
+    }`,
+    rootResolver: {
+        queryGraphlet: async () => await app.Q('{example}')
+    }      
+})
+```
+This will create a second graphlet with a single resolver that uses example for its resolution. This way all dependencies are always pointing towards the schema.
+The complete schema for all graphlets in this example would be:
+```graphql
+type Query {
+    example: String
+    queryGraphlet: String
+}
+```
+The schema can be introspected and seen with Graphiql by creating another graphlet:
+```javascript
+import express from 'express';
+import { Graphlet } from '@graphle/graphlet';
+import {VerboseLogging} from "@graphle/graphlet/logging/verbose.logger";
+
+const app = Graphlet.setupHttpFacade('http-facade')
+
+const app = express();
+app.listen(4000, () => {
+    app.use('/graphql', app.makeHttpMiddleware());
+    VerboseLogging.info('Running a GraphQL API server at http://localhost:4000/graphql')
+});
+```
+
+[Graphle Demo](https://github.com/fredlange/Graphle-Demo) repo will be the main repo to showcase how Graphle can be used to build your application.
 
 There are some demo applications available under `demo` folder. These are mainly used for development as experimental playgrounds
 
