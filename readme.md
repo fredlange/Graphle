@@ -1,28 +1,30 @@
-# GrApp -  Microservices as a graph
+# Graphle -  Microservices as a graph
 
-The idea behind GrApp is to use a dynamic graphql schema as the sole dependency for microservice communication.
-Every service is a "component" of the cluster.
-Components contributing to the schema is a peer. Peers build and resolve data to the schema.
-Components who only reads the schema is a spectator. Spectators can change the schema but should not do so.
-They should rather listen for schema changes do things. One example is exposing the schema by http (se demo spectator)
-Both peers and spectators are prototypes. Their purpose may change greatly.
+The idea behind Graphle is to use a dynamic graphql schema as the sole dependency for microservice communication.
+Every service is a component or "Graphlet" of the cluster.
+Graphlet contributing to the schema is a peer. Peers build and resolve data to the schema.
 
-## Current state
-The current state of GrApp is a POC to showcase potential of dynamic schema and custom UDP links rather than http. There are many many bugs and weird design choices!
+Facades are used to expose the schema to the outside world, for instance by Http. There is a HttpFacade provided that will expose the schema thru http and with Graphiql active.
 
 ## Getting started
-There are some demo applications available under `demo` folder
-* First start the manager `npm run start:orator`
-* App `npm run start:app1:dev`
-* App2 `npm run start:app2:dev`
-* Spectator `npm run start:spectator:dev`
+`npm install @graphle/graphlet`
+Graphle Demo repo will be the main repo to showcase how Graphle can be used to build your application.
 
-### The Orator
-The orator is the only application with a fixed port. All apps notify the orator of their liveliness and the orator then broadcast that state to all other apps, hence keeping in sync (or so they should be).
-### Demo apps
-App and app2 are the most simplistic apps to showcase how GrApp is used by an end user
-### Spectator
-The spectator provided sets up a graphiql instance to be able to use http to query against the flexible schema. The subschemas of the spectator will use UDP.
+There are some demo applications available under `demo` folder. These are mainly used for development as experimental playgrounds
+
+## Current state
+The current state of Graphle is a POC to showcase potential of dynamic schema and custom UDP links rather than http. There are many many bugs and weird design choices!
+
+## Overview
+### Graphlets
+Graphlets are the components or modules that make up the application. Graphlets talk to each other thru graphql and links. 
+Graphlets require a schema and resolver functions as any graphql implementation do. 
+### Orator
+The orator is currently acting as a broadcasting agent that will remember all other graphlets and make sure they all are notified whenever the cluster changes state.
+### UDP protocol
+Http is an overhead for graphql and one ambition of the Graphle project is to provide a essentials only version of UDP as transport layer. 
+This goal is to make the overhead small enough for a graphlet to be very small. By doing so we hope to encourage small specialized graphlets rather than bigger ones for the simple reason of keeping internal communication fast.
+The custom protocol currently support queries only but subscriptions will be supported soon.
 
 ## Known bugs / Todo
 * Orator does not emit even whenever a clients crashes
