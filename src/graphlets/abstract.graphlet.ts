@@ -61,12 +61,19 @@ export abstract class AbstractGraphlet implements Graphlet.IGraphlet {
 
         this.clusterManager.respondOnQuery(async msg => {
             VerboseLogging.debug('On Query Message:', msg)
-            const res = await graphql(this._schema, msg.payload.query, this._rootResolver, {}, msg.payload.variables)
+            const res = await this.query(msg.payload.query, msg.payload.variables)
             VerboseLogging.debug('GQL Response:', res)
             return new ResponseMessage(msg.ref, res)
         })
     }
 
+    /**
+     * Query the graphlets local schema.
+     * This is the main function whenever a query is executed.
+     * @param query
+     * @param variables
+     * @protected
+     */
     protected async query(query: string, variables: any = {}): Promise<any> {
         let executionResult = await graphql(this._schema, query, this._rootResolver, {}, variables);
         VerboseLogging.debug('Execution result:', executionResult)
