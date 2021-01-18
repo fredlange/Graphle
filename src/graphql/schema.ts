@@ -3,6 +3,9 @@ import {buildSchema, GraphQLSchema, print} from "graphql";
 import {ClusterManager} from "../clustering/ClusterManager";
 
 
+export {GraphQLSchema} from "graphql";
+export {makeExecutableSchema} from "graphql-tools"
+
 export function createSubschema(source: string, remoteName: string, clusterManager: ClusterManager): SubschemaConfig {
     return {
         schema: buildSchema(source),
