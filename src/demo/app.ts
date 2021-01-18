@@ -14,7 +14,6 @@ const root = {
     },
     seriousHatred: async () => {
         const poop = await app.Q(`{ iHate }`)
-        console.log('poop', poop)
         return 'ARGH ' + poop.data.iHate;
 
     }
