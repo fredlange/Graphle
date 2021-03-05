@@ -1,8 +1,7 @@
-import {createSocket, RemoteInfo, Socket} from "dgram";
+import {RemoteInfo} from "dgram";
 import {EventEmitter} from "events";
 import {getRandomInt} from "../DummyUtils";
 import {Component} from "../cluster.registry";
-import {VerboseLogging} from "../../logging/verbose.logger";
 
 export interface ClusterLink extends EventEmitter {
     onMessage(handler: (msg: IncomingMessage) => void)
@@ -23,7 +22,7 @@ export interface StateRehydratePayload {
     }
 }
 
-interface Message {
+export interface Message {
     type: LinkEvents
     payload: any
 }
@@ -119,10 +118,16 @@ export enum LinkEvents {
     QUERY = 'QUERY',
 }
 
-export interface LinkOptions {
-    serverPort: number
-    linkPort?: number
+export interface NodeOptions {
+    bootstrapPort: number
+    node?: {
+        port?: number
+        address?: string
+    }
+    // nodePort?: number
+    // nodeAddress?: string
 }
+
 export enum LinkErrorReasons {
     TIMEOUT = 'NO_REPLY_IN_TIME'
 }
@@ -130,68 +135,4 @@ export enum LinkErrorReasons {
 export interface ErrorMessage {
     code: LinkErrorReasons,
     msg: Message
-}
-export class UDPLink extends EventEmitter implements ClusterLink {
-
-    private readonly serverPort: number
-    private socket: Socket
-
-    constructor(opt: LinkOptions) {
-        super()
-        this.serverPort = opt.serverPort
-        this.socket = createSocket('udp4')
-        this.socket
-            .on('connect', () => VerboseLogging.debug('Connected'))
-            .on('listening', () => {
-                const address = this.socket.address();
-                VerboseLogging.info(`Component listening ${address.address}:${address.port}`);
-            })
-            .bind(opt.linkPort)
-
-        this.setupMessageResponseHandler()
-
-    }
-
-    exchange(port: number, msg: RequestMessage): Promise<IncomingMessage> {
-        let promise = new Promise<IncomingMessage>((resolve, reject) => {
-            this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
-                if (reply.ref == msg.id) {
-                    resolve(reply.payload)
-                }
-            })
-        });
-
-        this.sendMessage(port, msg)
-        return promise
-
-    }
-
-    setupMessageResponseHandler() {
-        this.socket.on('message', (m, r) => {
-                const incomingMessage = new IncomingMessage(m, r);
-                if (incomingMessage.isTyped()) this.emit(incomingMessage.type, incomingMessage)
-            }
-        )
-    }
-
-    onMessage(messageHandlerFn: (msg: IncomingMessage) => void) {
-        this.socket.on('message', (m, r) =>
-            messageHandlerFn(new IncomingMessage(m, r)))
-    }
-
-    sendMessage(port: number, msg: Message) {
-        const _msg = JSON.stringify(msg)
-        this.socket.send(_msg, port)
-
-    }
-
-    sendToServer(msg: string): void {
-        this.socket.send(msg, this.serverPort)
-    }
-
-    shutdownLink() {
-        this.socket.close()
-    }
-
-
 }

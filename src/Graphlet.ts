@@ -16,6 +16,8 @@ export namespace Graphlet {
         source: string
         rootResolver: any
         role: Role
+        address?: string
+        port?: number
     }
 
     export enum Role {

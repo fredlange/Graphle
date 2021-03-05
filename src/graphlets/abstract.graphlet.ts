@@ -1,4 +1,3 @@
-
 import {Graphlet} from "../Graphlet";
 import {ClusterEvents, ClusterManager} from "../clustering/ClusterManager";
 import {VerboseLogging} from "../logging/verbose.logger";
@@ -7,7 +6,7 @@ import {ComponentRegistry} from "../clustering/ComponentRegistry";
 import {IComponentRegistry} from "../clustering/cluster.registry";
 import {ResponseMessage} from "../clustering/link/ClusterLink";
 
-import {GraphQLSchema, createSubschema, stitch, makeExecutableSchema} from "../graphql/schema";
+import {createSubschema, GraphQLSchema, makeExecutableSchema, stitch} from "../graphql/schema";
 import {graphql, graphqlHTTP} from "../graphql";
 
 export abstract class AbstractGraphlet implements Graphlet.IGraphlet {
@@ -28,7 +27,13 @@ export abstract class AbstractGraphlet implements Graphlet.IGraphlet {
         this._rootResolver = opt.rootResolver
         this.clusterManager = new ClusterManager({
             appName: opt.name,
-            link: new ExchangeableLink({serverPort: 41236}),
+            link: new ExchangeableLink({
+                bootstrapPort: 41236,
+                node: {
+                    address: opt.address,
+                    port: opt.port
+                }
+            }),
             role: opt.role,
             componentRegistry: new ComponentRegistry(opt.name)
         });

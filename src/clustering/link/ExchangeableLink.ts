@@ -1,6 +1,7 @@
-import {ErrorMessage, IncomingMessage, LinkErrorReasons, LinkEvents, RequestMessage, UDPLink} from "./ClusterLink";
+import {ErrorMessage, IncomingMessage, LinkErrorReasons, LinkEvents, NodeOptions, RequestMessage,} from "./ClusterLink";
 import PromiseController from 'promise-controller';
 import {VerboseLogging} from "../../logging/verbose.logger";
+import {UDPLink} from "./UDPLink";
 
 export class ExchangeableLink extends UDPLink {
 
@@ -9,7 +10,7 @@ export class ExchangeableLink extends UDPLink {
      */
     private inflightRequests = {}
 
-    constructor(opt: { linkPort?: number, serverPort: number }) {
+    constructor(opt: NodeOptions) {
         super(opt);
         this.on(LinkEvents.REPLY, (reply: IncomingMessage) => {
             // TODO What if the reply ref does not exists?
