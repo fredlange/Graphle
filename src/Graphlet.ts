@@ -9,6 +9,8 @@ export namespace Graphlet {
         name: string
         source: string
         rootResolver: any
+        address?: string
+        port?: number
     }
 
     export interface Options {
@@ -40,11 +42,11 @@ export namespace Graphlet {
         })
     }
 
-    export function setupHttpFacade(name: string): HttpFacadeGraphlet {
+    export function setupHttpFacade(name: string, address?: string, port?: number): HttpFacadeGraphlet {
         return new HttpFacadeGraphlet({
             name: name,
-            rootResolver: {},
-            source:'type Query'
+            address: address,
+            port: port
         })
     }
 

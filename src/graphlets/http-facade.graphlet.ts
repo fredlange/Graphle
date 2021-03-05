@@ -3,8 +3,12 @@ import {AbstractGraphlet} from "./abstract.graphlet";
 
 export class HttpFacadeGraphlet extends AbstractGraphlet implements Graphlet.IGraphlet {
 
-    constructor(config: { name: string, source: string, rootResolver: any }) {
-        super({...config, role: Graphlet.Role.FACADE})
+    constructor(config: { name: string, address?: string, port?: number }) {
+        super({
+            ...config,
+            rootResolver: {},
+            source: 'type Query',
+            role: Graphlet.Role.FACADE})
     }
 
     /**
