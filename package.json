@@ -1,6 +1,6 @@
 {
   "name": "@graphle/graphlet",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "repository": {
     "url": "https://github.com/fredlange/Graphle"
   },
@@ -13,7 +13,8 @@
     "start:app2:dev": "nodemon --watch '*.ts' --exec 'ts-node' ./src/demo/app2.ts",
     "test": "jest",
     "build": "tsc",
-    "pub": "npm run build && cp package.json dist/ && cp readme.md dist/ && cd dist/ && npm publish --access public"
+    "build:lib": "npm run build && cp package.json dist/ && cp readme.md dist/",
+    "pub": "cd dist/ && npm publish --access public"
   },
   "license": "ISC",
   "dependencies": {
